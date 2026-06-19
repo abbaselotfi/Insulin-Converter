@@ -156,7 +156,7 @@
 
     <div class="form-group" id="freqFromBox" style="display: none;">
         <label for="freqFrom">⏱️ فرکانس تزریق انسولین مبدأ:</label>
-        <select id="freqFrom">
+        <select id="freqFrom" onchange="updateRegimen()">
             <option value="1">۱ بار در روز (QD)</option>
             <option value="2">۲ بار در روز (BID - مجموع دوز ۲۴ ساعته)</option>
         </select>
@@ -191,7 +191,7 @@
 
     <div class="form-group" id="freqToBox" style="display: none;">
         <label for="freqTo">⏱️ فرکانس تزریق انسولین مقصد:</label>
-        <select id="freqTo">
+        <select id="freqTo" onchange="updateRegimen()">
             <option value="1">۱ بار در روز (QD)</option>
             <option value="2">۲ بار در روز (BID)</option>
         </select>
@@ -231,32 +231,82 @@
 </div>
 
 <script>
+    // دسته‌بندی علمی انواع انسولین جهت قرنطینه و فیلترینگ متقابل
+    function getGroupType(val) {
+        if(['lantus','toujeo','tresiba','levemir','nph_basal'].includes(val)) return 'basal';
+        if(['novomix','humalog_mix','ryzodeg','human_mix'].includes(val)) return 'premix';
+        if(val === 'soliqua_50' || val === 'soliqua_33') return 'soliqua';
+        if(val === 'apidra_novorapid' || val === 'regular') return 'bolus';
+        return 'basal';
+    }
+
     function updateRegimen() {
         const insFromSelect = document.getElementById('insFrom');
         const insToSelect = document.getElementById('insTo');
         
         let valFrom = insFromSelect.value;
         let valTo = insToSelect.value;
+        let fromGroup = getGroupType(valFrom);
+        let toGroup = getGroupType(valTo);
 
-        if (valFrom === valTo) {
+        // مدیریت تغییر خودکار در صورت تطابق نادرست اولیه بین گروه بولوس و سایرین
+        if (fromGroup === 'bolus' && toGroup !== 'bolus') {
             for (let opt of insToSelect.options) {
-                if (opt.value !== valFrom) {
+                if (getGroupType(opt.value) === 'bolus' && opt.value !== valFrom) {
                     insToSelect.value = opt.value;
                     valTo = opt.value;
+                    toGroup = 'bolus';
                     break;
+                }
+            }
+        } else if (fromGroup !== 'bolus' && toGroup === 'bolus') {
+            for (let opt of insToSelect.options) {
+                if (getGroupType(opt.value) !== 'bolus' && opt.value !== valFrom) {
+                    insToSelect.value = opt.value;
+                    valTo = opt.value;
+                    toGroup = getGroupType(opt.value);
+                    break;
+                }
+            }
+        } else if (valFrom === valTo) {
+            for (let opt of insToSelect.options) {
+                if (opt.value !== valFrom) {
+                    const optGroup = getGroupType(opt.value);
+                    if ((fromGroup === 'bolus' && optGroup === 'bolus') || (fromGroup !== 'bolus' && optGroup !== 'bolus')) {
+                        insToSelect.value = opt.value;
+                        valTo = opt.value;
+                        toGroup = optGroup;
+                        break;
+                    }
                 }
             }
         }
 
+        // قفل و فیلتر کردن متقابل دوطرفه کرکره مقصد (حذف بولوس در صورت انتخاب پایه/میکس/سولیکوآ و بالعکس)
         for (let opt of insToSelect.options) {
-            opt.disabled = (opt.value === valFrom);
-            opt.style.display = (opt.value === valFrom) ? 'none' : 'block';
-        }
-        for (let opt of insFromSelect.options) {
-            opt.disabled = (opt.value === valTo);
-            opt.style.display = (opt.value === valTo) ? 'none' : 'block';
+            const optGroup = getGroupType(opt.value);
+            let isCompatible = true;
+            if (valFrom === opt.value) isCompatible = false;
+            if (fromGroup === 'bolus' && optGroup !== 'bolus') isCompatible = false;
+            if (fromGroup !== 'bolus' && optGroup === 'bolus') isCompatible = false;
+
+            opt.disabled = !isCompatible;
+            opt.style.display = isCompatible ? 'block' : 'none';
         }
 
+        // قفل و فیلتر کردن متقابل دوطرفه کرکره مبدأ جهت یکپارچگی انتخاب‌ها
+        for (let opt of insFromSelect.options) {
+            const optGroup = getGroupType(opt.value);
+            let isCompatible = true;
+            if (valTo === opt.value) isCompatible = false;
+            if (toGroup === 'bolus' && optGroup !== 'bolus') isCompatible = false;
+            if (toGroup !== 'bolus' && optGroup === 'bolus') isCompatible = false;
+
+            opt.disabled = !isCompatible;
+            opt.style.display = isCompatible ? 'block' : 'none';
+        }
+
+        // بارگذاری هوشمند گایدلاین‌های مربوطه
         const guidelineSelect = document.getElementById('guideline');
         const previousSelection = guidelineSelect.value;
         guidelineSelect.innerHTML = '';
@@ -278,10 +328,11 @@
             }
         }
 
+        // کنترل نمایش فیلدهای فرکانس تزریق بر اساس نوع انسولین
         const strictlyOnceDaily = ['toujeo', 'tresiba', 'soliqua_50', 'soliqua_33'];
         
         const freqFromBox = document.getElementById('freqFromBox');
-        if (!strictlyOnceDaily.includes(valFrom)) {
+        if (!strictlyOnceDaily.includes(valFrom) && fromGroup !== 'bolus') {
             freqFromBox.style.display = 'block';
         } else {
             freqFromBox.style.display = 'none';
@@ -289,27 +340,44 @@
         }
 
         const freqToBox = document.getElementById('freqToBox');
-        if (!strictlyOnceDaily.includes(valTo)) {
+        if (!strictlyOnceDaily.includes(valTo) && toGroup !== 'bolus') {
             freqToBox.style.display = 'block';
         } else {
             freqToBox.style.display = 'none';
             document.getElementById('freqTo').value = '1';
         }
 
+        // کنترل جعبه استراتژی کاهش دوز
         const strategyBox = document.getElementById('strategyBox');
-        if (valTo.includes('soliqua')) {
+        if (valTo.includes('soliqua') || fromGroup === 'bolus') {
             strategyBox.style.display = 'none';
         } else {
             strategyBox.style.display = 'block';
+            
+            const isBIDFrom = (freqFromBox.style.display !== 'none' && document.getElementById('freqFrom').value === '2');
+            const isBIDTo = (freqToBox.style.display !== 'none' && document.getElementById('freqTo').value === '2');
+            const strategySelect = document.getElementById('strategy');
+            
+            if (isBIDFrom) {
+                strategySelect.value = "0.8"; 
+            } else if (isBIDTo) {
+                strategySelect.value = "1.0"; // پیش‌فرض سوییچ معادل برای تبدیل QD به BID
+            }
+            
             updateStrategies();
         }
     }
 
-    // اعمال اصلاحیه نگارشی و پویای شما برای گزینه دوز معادل
+    // به‌روزرسانی ادبیات علمی و پیام‌های انتخابی در منوی کاهش دوز
     function updateStrategies() {
         const guide = document.getElementById('guideline').value;
         const strategySelect = document.getElementById('strategy');
         if (!strategySelect) return;
+
+        const freqFromBox = document.getElementById('freqFromBox');
+        const freqToBox = document.getElementById('freqToBox');
+        const isBIDFrom = (freqFromBox && freqFromBox.style.display !== 'none' && document.getElementById('freqFrom').value === '2');
+        const isBIDTo = (freqToBox && freqToBox.style.display !== 'none' && document.getElementById('freqTo').value === '2');
 
         let guideName = '';
         if (guide === 'ada') guideName = 'ADA';
@@ -318,18 +386,22 @@
         if (guide === 'nice') guideName = 'NICE';
         if (guide === 'sanofi') guideName = 'Sanofi';
 
-        strategySelect.options[0].text = `کاهش ۲۰ درصدی دوز (رویکرد محافظه‌کارانه بر اساس گایدلاین ${guideName})`;
-        strategySelect.options[1].text = `پایش مستقیم بالینی و تجویز دوز معادل بر اساس گایدلاین ${guideName}`;
-        strategySelect.options[2].text = `کاهش ۱۵ درصدی دوز (تعدیل استاندارد بالینی بر اساس گایدلاین ${guideName})`;
+        if (isBIDFrom) {
+            strategySelect.options[0].text = `کاهش ۲۰ درصدی دوز (رویکرد الزامی بر اساس رژیم BID مبدأ)`;
+            strategySelect.options[1].text = `پایش مستقیم (توصیه نمی‌شود - ریسک بالای هیپوگلیسمی)`;
+            strategySelect.options[2].text = `کاهش ۱۵ درصدی دوز (حداقل تعدیل محافظه‌کارانه)`;
+        } else if (isBIDTo) {
+            strategySelect.options[0].text = `کاهش ۲۰ درصدی دوز (رویکرد فوق‌محافظه‌کارانه)`;
+            strategySelect.options[1].text = `تجویز دوز معادل ۱:۱ و تقسیم آن (رویکرد استاندارد گایدلاین‌ها)`;
+            strategySelect.options[2].text = `کاهش ۱۵ درصدی دوز (تعدیل احتیاطی بالینی)`;
+        } else {
+            strategySelect.options[0].text = `کاهش ۲۰ درصدی دوز (رویکرد محافظه‌کارانه بر اساس گایدلاین ${guideName})`;
+            strategySelect.options[1].text = `پایش مستقیم بالینی و تجویز دوز معادل بر اساس گایدلاین ${guideName}`;
+            strategySelect.options[2].text = `کاهش ۱۵ درصدی دوز (تعدیل استاندارد بالینی بر اساس گایدلاین ${guideName})`;
+        }
     }
 
-    function getGroupType(val) {
-        if(['lantus','toujeo','tresiba','levemir','nph_basal'].includes(val)) return 'basal';
-        if(['novomix','humalog_mix','ryzodeg','human_mix'].includes(val)) return 'premix';
-        if(val === 'soliqua_50' || val === 'soliqua_33') return 'soliqua';
-        return 'bolus';
-    }
-
+    // موتور محاسباتی اصلی و اعمال منطق ریاضی ریاضی گایدلاین‌ها
     function convertInsulin() {
         const dose = parseFloat(document.getElementById('currentDose').value);
         const insFrom = document.getElementById('insFrom').value;
@@ -352,7 +424,13 @@
         const fromGroup = getGroupType(insFrom);
         const toGroup = getGroupType(insTo);
 
-        if (insTo === 'soliqua_50') {
+        // ۱. سناریوی تعویض بولوس به بولوس (ایزوله کامل)
+        if (fromGroup === 'bolus') {
+            newDose = Math.round(dose);
+            explanation = "تبدیل انسولین‌های سریع‌الاثر/بولوس (Short/Rapid-acting): طبق راهنماهای بالینی، تعویض بین آنالوگ‌های سریع هم‌گروه (مانند نوورپید به آپیدرا یا برعکس) کاملاً به صورت مستقیم و واحدبه‌واحد (1:1) انجام می‌پذیرد و تغییر دوز ساختاری ندارد.";
+        }
+        // ۲. سناریوی اختصاصی قلم زرد سولیکوآ
+        else if (insTo === 'soliqua_50') {
             if (dose >= 20 && dose <= 30) {
                 newDose = dose;
                 explanation = "سوییچ به سولیکوآ ۱۰۰/۵۰ (قلم زرد). طبق پروتکل رسمی Sanofi/EMA، برای TDD انسولین پایه بین ۲۰ تا ۳۰ واحد، شروع درمان بر مبنای دوز معادل انجام می‌شود.";
@@ -367,6 +445,7 @@
                 explanation += " [توجه: به دلیل رژیم BID قبلی بیمار، دوز ورودی به عنوان مجموع TDD لحاظ شده است].";
             }
         } 
+        // ۳. سناریوی اختصاصی قلم زیتونی سولیکوآ
         else if (insTo === 'soliqua_33') {
             if (insFrom === 'soliqua_50') {
                 if (dose >= 40) {
@@ -387,12 +466,21 @@
                 explanation += " [توجه: دوز بر اساس مجموع TDD محاسبه شده است].";
             }
         } 
+        // ۴. منطق محاسبات عمومی و اختصاصی سایر انسولین‌ها بر اساس گایدلاین‌ها
         else {
             let finalMultiplier = initialMultiplier;
 
             if (isBIDFrom) {
                 finalMultiplier = 0.80;
-                explanation = "محاسبه بر اساس فرکانس BID: به دلیل تزریق ۲ بار در روز انسولین مبدأ، گایدلاین‌های بالینی (ADA/AACE) جهت کنترل ریسک هیپوگلیسمی، کاهش حتمی ۲۰ درصدی را روی مجموع TDD اعمال می‌کنند. ";
+                explanation = "محاسبه بر اساس فرکانس BID مبدأ: به دلیل تزریق ۲ بار در روز انسولین مبدأ، گایدلاین‌های بالینی (ADA/AACE) جهت کنترل ریسک هیپوگلیسمی، کاهش حتمی ۲۰ درصدی را روی مجموع TDD اعمال می‌کنند. ";
+            } else if (isBIDTo) {
+                if (initialMultiplier === 1.0) {
+                    finalMultiplier = 1.0;
+                    explanation = "دستورالعمل بالینی در تبدیل یک‌بار به دوبار در روز (QD به BID): در این نوع سوییچ برعکس حالت قبل، دوز کل روزانه (TDD) نیازی به کاهش پیش‌فرض ندارد و تبدیل ۱:۱ توصیه اصلی گایدلاین‌ها است؛ زیرا شکستن و تقسیم دوز به دو نوبت، خودبه‌خود از تمرکز پیک غلظتی انسولین در یک زمان کاسته و ریسک افت قند خون را به شدت کنترل می‌کند. ";
+                } else {
+                    finalMultiplier = initialMultiplier;
+                    explanation = `محاسبه دوز بر اساس تعدیل احتیاطی انتخاب‌شده با ضریب ${finalMultiplier} جهت انتقال به رژیم BID انجام شد. `;
+                }
             } else {
                 if (guide === 'ada') {
                     if (insFrom === 'toujeo' && insTo === 'lantus') {
@@ -420,7 +508,7 @@
                 else if (guide === 'canadian') {
                     if (fromGroup === 'basal' && toGroup === 'basal' && insFrom !== 'toujeo') {
                         finalMultiplier = 1.0; 
-                        explanation = "دستورالعمل Diabetes Canada: این گایدلاین تعویض آنالوگ‌های پایه هم‌سط (مانند لانتوس و دگلودک) را به صورت مستقیم و با پایش بالینی مجاز می‌داند. ";
+                        explanation = "دستورالعمل Diabetes Canada: این گایدلاین تعویض آنالوگ‌های پایه هم‌سطح (مانند لانتوس و دگلودک) را به صورت مستقیم و با پایش بالینی مجاز می‌داند. ";
                     } else if (insFrom === 'nph_basal') {
                         finalMultiplier = 0.80;
                         explanation = "معیار Diabetes Canada: انتقال دوز از NPH به آنالوگ‌های مدرن شامل کاهش ساختاری ۲۰ درصدی دوز کل است. ";
@@ -440,6 +528,7 @@
 
             newDose = Math.round(dose * finalMultiplier);
             
+            // نمایش پیشنهاد توزیع دوز در صورت تبدیل به رژیم دوبار در روز
             if (isBIDTo) {
                 let amDose = Math.round(newDose * 0.5);
                 let pmDose = newDose - amDose;
@@ -447,6 +536,7 @@
             }
         }
 
+        // رندر کردن نتایج نهایی بر روی رابط کاربری
         document.getElementById('resultText').innerText = `${newDose} واحد`;
         document.getElementById('descText').innerText = explanation;
         document.getElementById('resultBox').style.display = 'block';
