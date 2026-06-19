@@ -180,7 +180,7 @@
                 <option value="novomix">نوومیکس ۳۰ (NovoMix)</option>
                 <option value="humalog_mix">هومالوگ میکس (Humalog Mix)</option>
                 <option value="ryzodeg">ریزودگ (Ryzodeg)</option>
-                <option value="human_mix">مخلوط انسانی ۷0/۳۰ (Human Mix)</option>
+                <option value="human_mix">مخلوط انسانی ۷۰/۳۰ (Human Mix)</option>
             </optgroup>
             <optgroup label="انسولین‌های سریع‌الاثر (Bolus)">
                 <option value="apidra_novorapid">آنالوگ سریع (NovoRapid / Apidra)</option>
@@ -247,22 +247,41 @@
         let valFrom = insFromSelect.value;
         let fromGroup = getGroupType(valFrom);
 
-        // ۱. فیلتر کردن هوشمند و یک‌طرفه کرکره مقصد (insTo) بر اساس انتخاب کرکره اول
-        for (let opt of insToSelect.options) {
-            const optGroup = getGroupType(opt.value);
-            let isCompatible = true;
+        // ۱. فیلتر کردن هوشمند کرکره مقصد (insTo) به همراه حذف داینامیک سرفصل‌ها (optgroup)
+        const optGroups = insToSelect.getElementsByTagName('optgroup');
+        for (let group of optGroups) {
+            let hasVisibleOption = false;
+            const options = group.getElementsByTagName('option');
+            
+            for (let opt of options) {
+                const optGroup = getGroupType(opt.value);
+                let isCompatible = true;
 
-            // قانون اول: عدم امکان انتخاب دقیقاً همان انسولین در مبدأ و مقصد
-            if (valFrom === opt.value) isCompatible = false;
+                // قانون اول: عدم امکان انتخاب دقیقاً همان انسولین در مبدأ و مقصد
+                if (valFrom === opt.value) isCompatible = false;
 
-            // قانون دوم: اگر در کرکره اول بولوس انتخاب شد، در کرکره دوم بقیه گروه‌ها (پایه/میکس/سولیکوآ) حذف شوند
-            if (fromGroup === 'bolus' && optGroup !== 'bolus') isCompatible = false;
+                // قانون دوم: اگر در کرکره اول بولوس انتخاب شد، در مقصد غیربولوس‌ها حذف شوند
+                if (fromGroup === 'bolus' && optGroup !== 'bolus') isCompatible = false;
 
-            // قانون سوم: اگر در کرکره اول بولوس انتخاب نشد، انسولین‌های بولوس از کرکره دوم کاملاً حذف شوند
-            if (fromGroup !== 'bolus' && optGroup === 'bolus') isCompatible = false;
+                // قانون سوم: اگر در کرکره اول غیربولوس انتخاب شد، در مقصد بولوس‌ها حذف شوند
+                if (fromGroup !== 'bolus' && optGroup === 'bolus') isCompatible = false;
 
-            opt.disabled = !isCompatible;
-            opt.style.display = isCompatible ? 'block' : 'none';
+                opt.disabled = !isCompatible;
+                opt.style.display = isCompatible ? 'block' : 'none';
+
+                if (isCompatible) {
+                    hasVisibleOption = true; // این گروه هنوز حداقل یک گزینه معتبر دارد
+                }
+            }
+
+            // مدیریت وضعیت نمایش خود سرفصل (optgroup) بر اساس زیرمجموعه‌هایش
+            if (hasVisibleOption) {
+                group.style.display = 'block';
+                group.disabled = false;
+            } else {
+                group.style.display = 'none';
+                group.disabled = true;
+            }
         }
 
         // ۲. بازنشانی خودکار و هوشمند مقدار کرکره دوم در صورت مخفی/غیرفعال شدن گزینه فعلی آن
