@@ -142,10 +142,22 @@
                 <option value="soliqua_50">سولیکوآ ۱۰۰/۵۰ (قلم زرد/هلویی - دوز ۱۰ تا ۴۰)</option>
                 <option value="soliqua_33">سولیکوآ ۱۰۰/۳۳ (قلم زیتونی - دوز ۳۰ تا ۶۰)</option>
             </optgroup>
-            <optgroup label="انسولین‌های پایه (Basal)">
-                <option value="lantus">لانتوس (Glargine U-100)</option>
-                <option value="toujeo">توژئو (Glargine U-300)</option>
-                <option value="nph">ان‌پی‌اچ (NPH)</option>
+            <optgroup label="انسولین‌های پایه (Long-Acting / Basal)">
+                <option value="lantus">لانتوس (Glargine U-100) - Lantus</option>
+                <option value="toujeo">توژئو (Glargine U-300) - Toujeo</option>
+                <option value="tresiba">دگلودک (Tresiba / Degludec)</option>
+                <option value="levemir">لِومیر (Detemir) - Levemir</option>
+                <option value="nph_basal">ان‌پی‌اچ (NPH/Insulin Isophane)</option>
+            </optgroup>
+            <optgroup label="انسولین‌های مخلوط (Premixed / Bi-Phasic)">
+                <option value="novomix">نوومیکس ۳۰ (NovoMix 30)</option>
+                <option value="humalog_mix">هومالوگ میکس ۲۵ و ۵۰ (Humalog Mix)</option>
+                <option value="ryzodeg">ریزودگ (Ryzodeg)</option>
+                <option value="human_mix">مخلوط انسانی ۷۰/۳۰ (Human Mix 70/30)</option>
+            </optgroup>
+            <optgroup label="انسولین‌های کوتاه‌سوز و سریع‌الاثر (Bolus / Short-Acting)">
+                <option value="apidra_novorapid">اسپارت/رپید/گلولیژن (NovoRapid, Apidra, Humalog)</option>
+                <option value="regular">رگولار انسانی (Regular / R)</option>
             </optgroup>
         </select>
     </div>
@@ -157,16 +169,38 @@
                 <option value="soliqua_50">سولیکوآ ۱۰۰/۵۰ (قلم زرد/هلویی)</option>
                 <option value="soliqua_33" selected>سولیکوآ ۱۰۰/۳۳ (قلم زیتونی)</option>
             </optgroup>
-            <optgroup label="انسولین‌های پایه (Basal)">
-                <option value="lantus">لانتوس (Glargine U-100)</option>
-                <option value="toujeo">توژئو (Glargine U-300)</option>
+            <optgroup label="انسولین‌های پایه (Long-Acting / Basal)">
+                <option value="lantus">لانتوس (Glargine U-100) - Lantus</option>
+                <option value="toujeo">توژئو (Glargine U-300) - Toujeo</option>
+                <option value="tresiba">دگلودک (Tresiba / Degludec)</option>
+                <option value="levemir">لِومیر (Detemir) - Levemir</option>
+                <option value="nph_basal">ان‌پی‌اچ (NPH/Insulin Isophane)</option>
+            </optgroup>
+            <optgroup label="انسولین‌های مخلوط (Premixed / Bi-Phasic)">
+                <option value="novomix">نوومیکس ۳۰ (NovoMix 30)</option>
+                <option value="humalog_mix">هومالوگ میکس ۲۵ و ۵۰ (Humalog Mix)</option>
+                <option value="ryzodeg">ریزودگ (Ryzodeg)</option>
+                <option value="human_mix">مخلوط انسانی ۷۰/۳۰ (Human Mix 70/30)</option>
+            </optgroup>
+            <optgroup label="انسولین‌های کوتاه‌سوز و سریع‌الاثر (Bolus / Short-Acting)">
+                <option value="apidra_novorapid">اسپارت/رپید/گلولیژن (NovoRapid, Apidra, Humalog)</option>
+                <option value="regular">رگولار انسانی (Regular / R)</option>
             </optgroup>
         </select>
     </div>
 
     <div class="form-group">
         <label for="currentDose">💊 دوز کل فعلی بیمار (واحد):</label>
-        <input type="number" id="currentDose" placeholder="مثلاً 25" min="1" max="100">
+        <input type="number" id="currentDose" placeholder="مثلاً 30" min="1" max="100">
+    </div>
+
+    <div class="form-group" id="reductionBox">
+        <label for="strategy">استراتژی کاهش دوز (برای جلوگیری از افت قند خون):</label>
+        <select id="strategy">
+            <option value="0.8">کاهش ۲۰ درصدی (پیشنهاد ایمن استاندارد)</option>
+            <option value="1.0">تبدیل واحد به واحد (۱:۱ بدون کاهش)</option>
+            <option value="0.85">کاهش ۱۵ درصدی</option>
+        </select>
     </div>
 
     <button onclick="convertInsulin()">محاسبه تبدیل دقیق</button>
@@ -178,15 +212,23 @@
     </div>
 
     <div class="alert-text" id="alertBox">
-        <strong>⚠️ هشدار بالینی مهم:</strong> محاسبات بر اساس گایدلاین سانوفی و EMA انجام شده است. پایش قند خون تیتراسیون را الزامی می‌سازد.
+        <strong>⚠️ هشدار بالینی مهم:</strong> محاسبات بر اساس گایدلاین‌های انتخابی انجام شده است. پایش قند خون تیتراسیون را الزامی می‌سازد.
     </div>
 </div>
 
 <script>
+    function getGroupType(val) {
+        if(['lantus','toujeo','tresiba','levemir','nph_basal'].includes(val)) return 'basal';
+        if(['novomix','humalog_mix','ryzodeg','human_mix'].includes(val)) return 'premix';
+        if(val === 'soliqua_50' || val === 'soliqua_33') return 'soliqua';
+        return 'bolus';
+    }
+
     function convertInsulin() {
         const dose = parseFloat(document.getElementById('currentDose').value);
         const insFrom = document.getElementById('insFrom').value;
         const insTo = document.getElementById('insTo').value;
+        const reduction = parseFloat(document.getElementById('strategy').value);
 
         if (isNaN(dose) || dose <= 0) {
             alert('لطفاً دوز معتبری وارد کنید.');
@@ -200,9 +242,13 @@
         let newDose = 0;
         let explanation = "";
 
+        const fromGroup = getGroupType(insFrom);
+        const toGroup = getGroupType(insTo);
+
+        // منطق اختصاصی تبدیل به سولیکوآ
         if (insTo === 'soliqua_50') {
             if (dose >= 20 && dose <= 30) {
-                newDose = dose; // دوز سوییچ مستقیم طبق رفرنس
+                newDose = dose;
                 explanation = "سوییچ به سولیکوآ ۱۰۰/۵۰ (قلم زرد). برای بیماران با سابقه درمان انسولین پایه بین ۲۰ تا ۳۰ واحد، شروع واحد به واحد با قلم ۱۰۰/۵۰ پیشنهاد می‌شود.";
             } else if (dose < 20) {
                 newDose = 10;
@@ -216,7 +262,7 @@
             if (insFrom === 'soliqua_50') {
                 if (dose >= 40) {
                     newDose = 40;
-                    explanation = "طبق پروتکل رسمی سانوفی، سقف دوز قلم ۱۰۰/۵۰ معادل ۴۰ واحد است. برای ادامه درمان و تیتراسیون افزایشی، بیمار باید با دوز ۴۰ واحد روی قلم ۱۰۰/۳۳ (زیتونی) سوییچ شود.";
+                    explanation = "طبق پروتکل رسمی، سقف دوز قلم ۱۰۰/۵۰ معادل ۴۰ واحد است. برای ادامه درمان، بیمار باید با دوز ۴۰ واحد روی قلم ۱۰۰/۳۳ (زیتونی) سوییچ شود.";
                 } else {
                     newDose = dose;
                     explanation = "انتقال بین دو قلم بر اساس دوز فعلی بیمار تنظیم گردید.";
@@ -226,11 +272,26 @@
                 explanation = "سوییچ از انسولین پایه قبلی به سولیکوآ ۱۰۰/۳۳ (قلم زیتونی). برای دوزهای پایه قبلی بالای ۳۰ واحد، دوز شروع استاندارد قلم زیتونی ۳۰ واحد است.";
             } else {
                 newDose = 30;
-                explanation = "شروع پیش‌فرض قلم ۱۰۰/۳۳ بر اساس گایدلاین سانوفی ۳۰ واحد می‌باشد.";
+                explanation = "شروع پیش‌فرض قلم ۱۰۰/۳۳ بر اساس گایدلاین سازنده ۳۰ واحد می‌باشد.";
             }
-        } else {
-            newDose = Math.round(dose * 0.8);
-            explanation = "تبدیل از سولیکوآ به انسولین پایه با ۲۰٪ کاهش دوز احتیاطی جهت ایمنی بیمار محاسبه شد.";
+        } 
+        // منطق عمومی تبدیل سایر انسولین‌ها
+        else {
+            newDose = Math.round(dose * reduction);
+            let redPercent = Math.round((1 - reduction) * 100);
+            
+            if (fromGroup === 'toujeo' && insTo === 'lantus') {
+                newDose = Math.round(dose * 0.8);
+                explanation = "تبدیل توژئو به لانتوس: کاهش ۲۰ درصدی دوز جهت جلوگیری از افت قند خون اعمال شد.";
+            } else if (fromGroup === 'basal' && toGroup === 'premix') {
+                newDose = Math.round(dose * 0.8);
+                explanation = "تغییر از انسولین پایه به پرمیکس/مخلوط: کاهش ۲۰ درصدی اعمال شده و دوز نهایی ترجیحاً تقسیم بر وعده‌ها شود.";
+            } else if (fromGroup === 'premix' && toGroup === 'basal') {
+                newDose = Math.round(dose * 0.8);
+                explanation = "تغییر از پرمیکس به پایه: دوز انسولین پایه جدید معادل ۸۰٪ دوز کل پرمیکس قبلی پیشنهاد می‌شود.";
+            } else {
+                explanation = `تبدیل بر اساس استراتژی منتخب با اعمال ${redPercent}% کاهش دوز احتیاطی انجام شد.`;
+            }
         }
 
         document.getElementById('resultText').innerText = `${newDose} واحد`;
