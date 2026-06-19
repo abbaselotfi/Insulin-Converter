@@ -145,7 +145,7 @@
                 <option value="novomix">نوومیکس ۳۰ (NovoMix)</option>
                 <option value="humalog_mix_25">هومالوگ میکس ۲۵ (Humalog Mix 25)</option>
                 <option value="humalog_mix_50">هومالوگ میکس ۵۰ (Humalog Mix 50)</option>
-                <option value="ryzodeg">ریزودگ (Ryzodeg)</option>
+                <option value="ryzodeg">رایزودگ (Ryzodeg)</option>
                 <option value="human_mix">مخلوط انسانی ۷۰/۳۰ (Human Mix)</option>
             </optgroup>
             <optgroup label="انسولین‌های سریع‌الاثر (Bolus)">
@@ -182,7 +182,7 @@
                 <option value="novomix">نوومیکس ۳۰ (NovoMix)</option>
                 <option value="humalog_mix_25">هومالوگ میکس ۲۵ (Humalog Mix 25)</option>
                 <option value="humalog_mix_50">هومالوگ میکس ۵۰ (Humalog Mix 50)</option>
-                <option value="ryzodeg">ریزودگ (Ryzodeg)</option>
+                <option value="ryzodeg">رایزودگ (Ryzodeg)</option>
                 <option value="human_mix">مخلوط انسانی ۷۰/۳۰ (Human Mix)</option>
             </optgroup>
             <optgroup label="انسولین‌های سریع‌الاثر (Bolus)">
@@ -387,28 +387,28 @@
         let guideName = '';
         if (guide === 'ada') guideName = 'ADA';
         if (guide === 'aace') guideName = 'AACE';
-        if (guide === 'canadian') guideName = 'Canada';
+        if (guide === 'canadian') guideName = 'Diabetes Canada';
         if (guide === 'nice') guideName = 'NICE';
         if (guide === 'sanofi') guideName = 'Sanofi';
 
         if (isTIDFrom) {
             strategySelect.options[0].text = `کاهش ۲۰ درصدی دوز (رویکرد الزامی گایدلاین‌ها در رژیم مبدأ TID)`;
-            strategySelect.options[1].text = `پایش مستقیم (عدم توصیه - خطر شدید هیپوگلیسمی)`;
+            strategySelect.options[1].text = `رویکرد استاندارد گایدلاین ${guideName}`;
             strategySelect.options[2].text = `کاهش ۱۵ درصدی دوز (حداقل تعدیل محافظه‌کارانه)`;
             strategySelect.value = "0.8";
         } else if (isBIDFrom) {
             strategySelect.options[0].text = `کاهش ۲۰ درصدی دوز (رویکرد الزامی بر اساس رژیم BID مبدأ)`;
-            strategySelect.options[1].text = `پایش مستقیم (توصیه نمی‌شود - ریسک بالای هیپوگلیسمی)`;
+            strategySelect.options[1].text = `رویکرد استاندارد گایدلاین ${guideName}`;
             strategySelect.options[2].text = `کاهش ۱۵ درصدی دوز (حداقل تعدیل محافظه‌کارانه)`;
             strategySelect.value = "0.8";
         } else if (isTIDTo || isBIDTo) {
             strategySelect.options[0].text = `کاهش ۲۰ درصدی دوز (رویکرد فوق‌محافظه‌کارانه در رژیم مقصد چندتزریقی)`;
-            strategySelect.options[1].text = `تجویز دوز معادل ۱:۱ و تقسیم آن (رویکرد استاندارد گایدلاین‌ها)`;
+            strategySelect.options[1].text = `رویکرد استاندارد گایدلاین ${guideName}`;
             strategySelect.options[2].text = `کاهش ۱۵ درصدی دوز (تعدیل احتیاطی بالینی)`;
             strategySelect.value = "1.0";
         } else {
             strategySelect.options[0].text = `کاهش ۲۰ درصدی دوز (رویکرد محافظه‌کارانه بر اساس گایدلاین ${guideName})`;
-            strategySelect.options[1].text = `پایش مستقیم بالینی و تجویز دوز معادل بر اساس گایدلاین ${guideName}`;
+            strategySelect.options[1].text = `رویکرد استاندارد گایدلاین ${guideName}`;
             strategySelect.options[2].text = `کاهش ۱۵ درصدی دوز (تعدیل استاندارد بالینی بر اساس گایدلاین ${guideName})`;
             strategySelect.value = "1.0";
         }
@@ -443,8 +443,8 @@
         let premixSplitNotice = "";
         
         if (fromGroup === 'premix' && (toGroup === 'basal' || toGroup === 'soliqua')) {
-            let premixFactor = 0.70; // پیش‌فرض برای نوومیکس، ریزودگ و میکس انسانی
-            let brandName = "نوومیکس/میکس انسانی/ریزودگ (نسبت ۷۰٪ بیزال)";
+            let premixFactor = 0.70; // پیش‌فرض برای نوومیکس، رایزودگ و میکس انسانی
+            let brandName = "نوومیکس/میکس انسانی/رایزودگ (نسبت ۷۰٪ بیزال)";
             
             if (insFrom === 'humalog_mix_25') {
                 premixFactor = 0.75;
@@ -463,7 +463,7 @@
         // ۱. تعویض بولوس به بولوس
         if (fromGroup === 'bolus') {
             newDose = Math.round(dose);
-            explanation = "تبدیل انسولین‌های سریع‌الاثر/بولوس: طبق راهنماهای بالینی، تعویض بین آنالوگ‌های سریع هم‌گروه (مانند نوورپید به آپیدرا) کاملاً به صورت مستقیم و واحدبه‌واحد (1:1) انجام می‌شود.";
+            explanation = "تبدیل انسولین‌های سریع‌الاثر/بولوس: طبق راهنماهای بالینی، تعویض بین آنالوگ‌های سریع هم‌گروه (مانند نوورپید به آپیدرا) کاملاً به صورت مستقیم و واحدبه-واحد (1:1) انجام می‌شود.";
         }
         // ۲. سوییچ به سولیکوآ ۱۰۰/۵۰ (قلم زرد)
         else if (insTo === 'soliqua_50') {
@@ -571,7 +571,7 @@
                 explanation = premixSplitNotice + "تعدیل رژیم پیچیده (TID Premix به Basal QD): با توجه به فرکانس ۳ بار در روز انسولین میکس، سهم پایه استخراج و به دلیل حذف کامل دوزهای سریع‌الاثر، کاهش دوز ۲۰ درصدی جهت پیشگیری از تجمع دوز اعمال شد. پایش قندهای بعد از غذا ضروری است. " + baseExplanation;
             } else if (isBIDFrom) {
                 finalMultiplier = Math.min(finalMultiplier, 0.80);
-                explanation = premixSplitNotice + "تعدیل فرکانس (BID به QD): به دلیل فرکانس ۲ بار در روز انسولین مبدأ، جهت جلوگیری از تجمع دوز در یک نوبت، کاهش دوز ۲۰ درصدی بر محاسبات اعمال شد. " + baseExplanation;
+                explanation = premixSplitNotice + "تعدیل فرکانس (BID به QD): به دلیل فرکانس ۲ بار در روز انسولین مبدأ, جهت جلوگیری از تجمع دوز در یک نوبت، کاهش دوز ۲۰ درصدی بر محاسبات اعمال شد. " + baseExplanation;
             } else if (isBIDTo) {
                 if (initialMultiplier === 1.0 && finalMultiplier === 1.0) {
                     explanation = premixSplitNotice + "دستورالعمل بالینی QD به BID: در این نوع سوییچ، تبدیل ۱:۱ توصیه اصلی است؛ زیرا شکستن دوز به دو نوبت، خودبه‌خود ریسک پیک غلظتی را کنترل می‌کند. " + baseExplanation;
