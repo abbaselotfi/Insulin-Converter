@@ -231,7 +231,6 @@
 </div>
 
 <script>
-    // دسته‌بندی علمی انواع انسولین جهت ایزوله‌سازی
     function getGroupType(val) {
         if(['lantus','toujeo','tresiba','levemir','nph_basal'].includes(val)) return 'basal';
         if(['novomix','humalog_mix','ryzodeg','human_mix'].includes(val)) return 'premix';
@@ -247,7 +246,6 @@
         let valFrom = insFromSelect.value;
         let fromGroup = getGroupType(valFrom);
 
-        // ۱. فیلتر کردن هوشمند کرکره مقصد (insTo) به همراه حذف داینامیک سرفصل‌ها (optgroup)
         const optGroups = insToSelect.getElementsByTagName('optgroup');
         for (let group of optGroups) {
             let hasVisibleOption = false;
@@ -257,24 +255,16 @@
                 const optGroup = getGroupType(opt.value);
                 let isCompatible = true;
 
-                // قانون اول: عدم امکان انتخاب دقیقاً همان انسولین در مبدأ و مقصد
                 if (valFrom === opt.value) isCompatible = false;
-
-                // قانون دوم: اگر در کرکره اول بولوس انتخاب شد، در مقصد غیربولوس‌ها حذف شوند
                 if (fromGroup === 'bolus' && optGroup !== 'bolus') isCompatible = false;
-
-                // قانون سوم: اگر در کرکره اول غیربولوس انتخاب شد، در مقصد بولوس‌ها حذف شوند
                 if (fromGroup !== 'bolus' && optGroup === 'bolus') isCompatible = false;
 
                 opt.disabled = !isCompatible;
                 opt.style.display = isCompatible ? 'block' : 'none';
 
-                if (isCompatible) {
-                    hasVisibleOption = true; // این گروه هنوز حداقل یک گزینه معتبر دارد
-                }
+                if (isCompatible) hasVisibleOption = true;
             }
 
-            // مدیریت وضعیت نمایش خود سرفصل (optgroup) بر اساس زیرمجموعه‌هایش
             if (hasVisibleOption) {
                 group.style.display = 'block';
                 group.disabled = false;
@@ -284,7 +274,6 @@
             }
         }
 
-        // ۲. بازنشانی خودکار و هوشمند مقدار کرکره دوم در صورت مخفی/غیرفعال شدن گزینه فعلی آن
         let currentToOpt = insToSelect.options[insToSelect.selectedIndex];
         if (!currentToOpt || currentToOpt.disabled || currentToOpt.style.display === 'none') {
             for (let opt of insToSelect.options) {
@@ -297,7 +286,6 @@
 
         let valTo = insToSelect.value;
 
-        // ۳. بارگذاری داینامیک گایدلاین‌ها بر اساس وضعیت نهایی انتخاب‌ها
         const guidelineSelect = document.getElementById('guideline');
         const previousSelection = guidelineSelect.value;
         guidelineSelect.innerHTML = '';
@@ -319,7 +307,6 @@
             }
         }
 
-        // ۴. کنترل نمایش فیلدهای فرکانس تزریق بر اساس نوع انسولین فعال
         const strictlyOnceDaily = ['toujeo', 'tresiba', 'soliqua_50', 'soliqua_33'];
         
         const freqFromBox = document.getElementById('freqFromBox');
@@ -338,7 +325,6 @@
             document.getElementById('freqTo').value = '1';
         }
 
-        // ۵. کنترل نمایش و مقادیر پیش‌فرض جعبه استراتژی کاهش دوز
         const strategyBox = document.getElementById('strategyBox');
         if (valTo.includes('soliqua') || fromGroup === 'bolus') {
             strategyBox.style.display = 'none';
@@ -352,14 +338,13 @@
             if (isBIDFrom) {
                 strategySelect.value = "0.8"; 
             } else if (isBIDTo) {
-                strategySelect.value = "1.0";
+                strategySelect.value = "1.0"; // برای حالت QD به BID پیش‌فرض دوز معادل است
             }
             
             updateStrategies();
         }
     }
 
-    // به‌روزرسانی متون و ادبیات علمی استراتژی‌ها
     function updateStrategies() {
         const guide = document.getElementById('guideline').value;
         const strategySelect = document.getElementById('strategy');
@@ -382,7 +367,7 @@
             strategySelect.options[1].text = `پایش مستقیم (توصیه نمی‌شود - ریسک بالای هیپوگلیسمی)`;
             strategySelect.options[2].text = `کاهش ۱۵ درصدی دوز (حداقل تعدیل محافظه‌کارانه)`;
         } else if (isBIDTo) {
-            strategySelect.options[0].text = `کاهش ۲۰ درصدی دوز (رویکرد فوق‌محافظه‌کارانه)`;
+            strategySelect.options[0].text = `کاهش ۲۰ درصدی دوز (رویکرد فوق‌محافظه‌کارانه در رژیم مقصد BID)`;
             strategySelect.options[1].text = `تجویز دوز معادل ۱:۱ و تقسیم آن (رویکرد استاندارد گایدلاین‌ها)`;
             strategySelect.options[2].text = `کاهش ۱۵ درصدی دوز (تعدیل احتیاطی بالینی)`;
         } else {
@@ -392,7 +377,7 @@
         }
     }
 
-    // موتور محاسباتی اصلی و اعمال فرمول‌های بالینی
+    // لایه‌بندی ماتریسی و کاملاً مهندسی‌شده موتور محاسباتی
     function convertInsulin() {
         const dose = parseFloat(document.getElementById('currentDose').value);
         const insFrom = document.getElementById('insFrom').value;
@@ -415,24 +400,31 @@
         const fromGroup = getGroupType(insFrom);
         const toGroup = getGroupType(insTo);
 
-        // ۱. سناریوی تعویض بولوس به بولوس
+        let effectiveDose = dose;
+        let premixSplitNotice = "";
+        
+        if (fromGroup === 'premix' && (toGroup === 'basal' || toGroup === 'soliqua')) {
+            effectiveDose = dose * 0.70;
+            premixSplitNotice = `با توجه به اینکه انسولین مبدأ از نوع مخلوط (Premix) است، ابتدا سهم ۷۰ درصدی بخش پایه‌ای (بیزال) آن یعنی ${effectiveDose.toFixed(1)} واحد استخراج گردید. `;
+        }
+
+        // ۱. تعویض بولوس به بولوس
         if (fromGroup === 'bolus') {
             newDose = Math.round(dose);
             explanation = "تبدیل انسولین‌های سریع‌الاثر/بولوس (Short/Rapid-acting): طبق راهنماهای بالینی، تعویض بین آنالوگ‌های سریع هم‌گروه (مانند نوورپید به آپیدرا) کاملاً به صورت مستقیم و واحدبه‌واحد (1:1) انجام می‌شود و کاهش دوز ساختاری ندارد.";
         }
         // ۲. سولیکوآ ۱۰۰/۵۰ (قلم زرد)
         else if (insTo === 'soliqua_50') {
-            if (dose >= 20 && dose <= 30) {
-                newDose = dose;
-                explanation = "سوییچ به سولیکوآ ۱۰۰/۵۰ (قلم زرد). طبق پروتکل رسمی Sanofi/EMA، برای TDD انسولین پایه بین ۲۰ تا ۳۰ واحد، شروع درمان بر مبنای دوز معادل انجام می‌شود.";
-            } else if (dose < 20) {
+            if (effectiveDose >= 20 && effectiveDose <= 30) {
+                newDose = effectiveDose;
+                explanation = premixSplitNotice + "سوییچ به سولیکوآ ۱۰۰/۵۰ (قلم زرد). طبق پروتکل رسمی Sanofi/EMA، برای دوز انسولین پایه بین ۲۰ تا ۳۰ واحد، شروع درمان بر مبنای دوز معادل انجام می‌شود.";
+            } else if (effectiveDose < 20) {
                 newDose = 10;
-                explanation = "به دلیل دوز پایه پایین قبلی (کمتر از ۲۰ واحد)، دوز شروع ایمن از کف دوز قلم زرد یعنی ۱۰ واحد تعیین گردید.";
+                explanation = premixSplitNotice + "به دلیل دوز پایه پایین قبلی (کمتر از ۲۰ واحد)، دوز شروع ایمن از کف دوز قلم زرد یعنی ۱۰ واحد تعیین گردید.";
             } else {
                 newDose = 30;
-                explanation = "دوز انسولین قبلی بالاتر از سقف شروع قلم زرد است؛ ارزیابی سوییچ مستقیم به قلم ۱۰۰/۳۳ (زیتونی) توصیه می‌شود.";
+                explanation = premixSplitNotice + "دوز انسولین پایه محاسباتی بالاتر از سقف شروع قلم زرد است؛ ارزیابی سوییچ مستقیم به قلم ۱۰۰/۳۳ (زیتونی) توصیه می‌شود.";
             }
-            if (isBIDFrom) explanation += " [توجه: مجموع دوز ۲۴ ساعته قبلی ملاک محاسبه قرار گرفته است].";
         } 
         // ۳. سولیکوآ ۱۰۰/۳۳ (قلم زیتونی)
         else if (insTo === 'soliqua_33') {
@@ -444,81 +436,82 @@
                     newDose = dose;
                     explanation = "انتقال بین دو قلم سولیکوآ بر اساس دوز جاری بیمار تنظیم شد.";
                 }
-            } else if (dose >= 30) {
+            } else if (effectiveDose >= 30) {
                 newDose = 30;
-                explanation = "سوییچ به سولیکوآ ۱۰۰/۳۳ (قلم زیتونی). برای دوزهای TDD مساوی یا بالای ۳۰ واحد، دوز شروع استاندارد پروتکل ۳۰ واحد است.";
+                explanation = premixSplitNotice + "سوییچ به سولیکوآ ۱۰۰/۳۳ (قلم زیتونی). برای دوزهای مساوی یا بالای ۳۰ واحد پایه، دوز شروع استاندارد پروتکل ۳۰ واحد است.";
             } else {
                 newDose = 30;
-                explanation = "شروع پیش‌فرض قلم زیتونی سولیکوآ طبق راهنمای کلینیکال دارو ۳۰ واحد می‌باشد.";
+                explanation = premixSplitNotice + "شروع پیش‌فرض قلم زیتونی سولیکوآ طبق راهنمای کلینیکال دارو ۳۰ واحد می‌باشد.";
             }
-            if (isBIDFrom) explanation += " [توجه: دوز بر اساس مجموع TDD محاسبه شده است].";
         } 
-        // ۴. محاسبات عمومی سایر گروه‌ها
+        // ۴. محاسبات عمومی با اصلاح معماری لایه‌ای (تداخل فرکانس و گایدلاین برطرف شد)
         else {
             let finalMultiplier = initialMultiplier;
+            let baseExplanation = "";
 
-            if (isBIDFrom) {
-                finalMultiplier = 0.80;
-                explanation = "محاسبه بر اساس فرکانس BID مبدأ: به دلیل تزریق ۲ بار در روز انسولین مبدأ، گایدلاین‌های بالینی (ADA/AACE) جهت کنترل ریسک هیپوگلیسمی، کاهش حتمی ۲۰ درصدی را روی مجموع TDD اعمال می‌کنند. ";
-            } else if (isBIDTo) {
-                if (initialMultiplier === 1.0) {
-                    finalMultiplier = 1.0;
-                    explanation = "دستورالعمل بالینی در تبدیل یک‌بار به دوبار در روز (QD به BID): در این نوع سوییچ، دوز کل روزانه (TDD) نیازی به کاهش پیش‌فرض ندارد و تبدیل ۱:۱ توصیه اصلی گایدلاین‌ها است؛ زیرا شکستن و تقسیم دوز به دو نوبت، خودبه‌خود از تمرکز پیک غلظتی انسولین در یک زمان کاسته و ریسک افت قند خون را به شدت کنترل می‌کند. ";
+            // لایه اول: استخراج قانون گایدلاین بر اساس نوع برند انسولین‌ها
+            if (guide === 'ada') {
+                if (insFrom === 'toujeo' && insTo === 'lantus') {
+                    finalMultiplier = 0.80; 
+                    baseExplanation = "ملاک اختصاصی ADA: در تبدیل توژئو به لانتوس به دلیل تفاوت فارماکوکینتیک غلظتی، کاهش ۲۰٪ دوز جهت ایمنی الزامی است. ";
+                } else if (insFrom === 'nph_basal' && ['lantus','toujeo','tresiba'].includes(insTo)) {
+                    finalMultiplier = 0.80;
+                    baseExplanation = "ملاک اختصاصی ADA: تغییر از NPH به آنالوگ‌های پیشرفته طولانی‌اثر، نیازمند کاهش دوز ۲۰٪ جهت پیشگیری از هیپوگلیسمی است. ";
+                } else if (fromGroup === 'premix' || toGroup === 'premix') {
+                    finalMultiplier = 0.80;
+                    baseExplanation = "توصیه عمومی ADA: در تعویض رژیم‌های حاوی مخلوط (Premix)، فرمول با اعمال ۲۰٪ کاهش احتیاطی محاسبه می‌شود. ";
                 } else {
-                    finalMultiplier = initialMultiplier;
-                    explanation = `محاسبه دوز بر اساس تعدیل احتیاطی انتخاب‌شده با ضریب ${finalMultiplier} جهت انتقال به رژیم BID انجام شد. `;
+                    baseExplanation = `پروتکل دوز بر مبنای معیار انتخابی ADA با ضریب ${finalMultiplier} تنظیم شد. `;
                 }
-            } else {
-                if (guide === 'ada') {
-                    if (insFrom === 'toujeo' && insTo === 'lantus') {
-                        finalMultiplier = 0.80; 
-                        explanation = "ملاک اختصاصی ADA: در تبدیل توژئو به لانتوس به دلیل تفاوت فارماکوکینتیک، کاهش ۲۰٪ دوز جهت ایمنی الزامی است. ";
-                    } else if (insFrom === 'nph_basal' && ['lantus','toujeo','tresiba'].includes(insTo)) {
-                        finalMultiplier = 0.80;
-                        explanation = "ملاک اختصاصی ADA: تغییر از NPH یک‌بار در روز به آنالوگ‌های پیشرفته طولانی‌اثر، نیازمند کاهش دوز ۲۰٪ جهت پیشگیری از هیپوگلیسمی شبانه است. ";
-                    } else if (fromGroup === 'premix' || toGroup === 'premix') {
-                        finalMultiplier = 0.80;
-                        explanation = "توصیه عمومی ADA: در تعویض رژیم‌های مخلوط (Premix)، فرمول با اعمال ۲۰٪ کاهش احتیاطی محاسبه می‌شود. ";
-                    } else {
-                        explanation = `محاسبه بر اساس استراتژی منتخب در گایدلاین ADA با ضریب ${finalMultiplier} انجام شد. `;
-                    }
-                } 
-                else if (guide === 'aace') {
-                    if (fromGroup !== toGroup) {
-                        finalMultiplier = Math.min(finalMultiplier, 0.80); 
-                        explanation = "الگوریتم محافظه‌کارانه AACE: در سوییچ‌های بین‌کلاسی، گایدلاین AACE اجازه تبدیل بدون کاهش دوز نداده و کاهش ۲۰ درصدی را قفل می‌کند. ";
-                    } else {
-                        finalMultiplier = Math.min(finalMultiplier, 0.85);
-                        explanation = "رویکرد کنترلی AACE: اعمال کاهش دوز ۱۵ تا ۲۰ درصدی برای پیشگیری ایمن از افت قند خون لحاظ گردید. ";
-                    }
-                } 
-                else if (guide === 'canadian') {
-                    if (fromGroup === 'basal' && toGroup === 'basal' && insFrom !== 'toujeo') {
-                        finalMultiplier = 1.0; 
-                        explanation = "دستورالعمل Diabetes Canada: این گایدلاین تعویض آنالوگ‌های پایه هم‌سطح (مانند لانتوس و دگلودک) را به صورت مستقیم و با پایش بالینی مجاز می‌داند. ";
-                    } else if (insFrom === 'nph_basal') {
-                        finalMultiplier = 0.80;
-                        explanation = "معیار Diabetes Canada: انتقال دوز از NPH به آنالوگ‌های مدرن شامل کاهش ساختاری ۲۰ درصدی دوز کل است. ";
-                    } else {
-                        explanation = `محاسبه بر اساس استراتژی منتخب در گایدلاین Diabetes Canada با ضریب ${finalMultiplier} انجام شد. `;
-                    }
-                } 
-                else if (guide === 'nice') {
-                    if (fromGroup === 'premix' || insFrom === 'nph_basal') {
-                        finalMultiplier = 0.80;
-                        explanation = "راهنمای کلینیکال NICE: انتقال از ساختارهای سنتی یا مخلوط به آنالوگ‌های خالص، شامل کاهش ۲۰ درصدی دوز پایه کل است. ";
-                    } else {
-                        explanation = `محاسبه بر اساس استراتژی منتخب در گایدلاین NICE با ضریب ${finalMultiplier} انجام شد. `;
-                    }
+            } 
+            else if (guide === 'aace') {
+                if (fromGroup !== toGroup || insFrom !== insTo) {
+                    finalMultiplier = Math.min(finalMultiplier, 0.80); 
+                    baseExplanation = "الگوریتم محافظه‌کارانه AACE: در سوییچ‌های بین‌کلاسی یا تغییر برند انسولین پایه، کاهش ۲۰ درصدی دوز قفل می‌شود. ";
+                } else {
+                    finalMultiplier = Math.min(finalMultiplier, 0.85);
+                    baseExplanation = `رویکرد کنترلی AACE: اعمال کاهش دوز احتیاطی با ضریب ${finalMultiplier} لحاظ گردید. `;
+                }
+            } 
+            else if (guide === 'canadian') {
+                if (fromGroup === 'basal' && toGroup === 'basal' && insFrom !== 'toujeo') {
+                    baseExplanation = "دستورالعمل Diabetes Canada: این گایدلاین تعویض آنالوگ‌های پایه هم‌سطح (مانند لانتوس و دگلودک) را به صورت مستقیم (1:1) مجاز می‌داند. ";
+                } else if (insFrom === 'nph_basal') {
+                    finalMultiplier = 0.80;
+                    baseExplanation = "معیار Diabetes Canada: انتقال دوز از NPH به آنالوگ‌های مدرن شامل کاهش ساختاری ۲۰ درصدی دوز کل است. ";
+                } else {
+                    baseExplanation = `محاسبه بر اساس استراتژی منتخب در گایدلاین Diabetes Canada با ضریب ${finalMultiplier} انجام شد. `;
+                }
+            } 
+            else if (guide === 'nice') {
+                if (fromGroup === 'premix' || insFrom === 'nph_basal') {
+                    finalMultiplier = 0.80;
+                    baseExplanation = "راهنمای کلینیکال NICE: انتقال از ساختارهای سنتی یا مخلوط به آنالوگ‌های خالص، شامل کاهش ۲۰ درصدی دوز پایه کل است. ";
+                } else {
+                    baseExplanation = `محاسبه بر اساس استراتژی منتخب در گایدلاین NICE با ضریب ${finalMultiplier} انجام شد. `;
                 }
             }
 
-            newDose = Math.round(dose * finalMultiplier);
+            // لایه دوم: اعمال قوانین حاکم بر فرکانس تزریق (بدون ابطال لایه اول)
+            if (isBIDFrom) {
+                finalMultiplier = Math.min(finalMultiplier, 0.80);
+                explanation = premixSplitNotice + "تعدیل فرکانس (BID به QD): به دلیل فرکانس ۲ بار در روز انسولین مبدأ، جهت جلوگیری از تجمع دوز در یک نوبت، کاهش دوز ۲۰ درصدی بر محاسبات اعمال شد. " + baseExplanation;
+            } else if (isBIDTo) {
+                if (initialMultiplier === 1.0 && finalMultiplier === 1.0) {
+                    explanation = premixSplitNotice + "دستورالعمل بالینی QD به BID: در این نوع سوییچ، دوز کل روزانه (TDD) نیازی به کاهش پیش‌فرض ندارد و تبدیل ۱:۱ توصیه اصلی است؛ زیرا شکستن دوز به دو نوبت، خودبه‌خود ریسک پیک غلظتی را کنترل می‌کند. " + baseExplanation;
+                } else {
+                    explanation = premixSplitNotice + `محاسبه دوز با ضریب تعدیل بالینی نهایی ${finalMultiplier} جهت انتقال ایمن به رژیم مقصد BID انجام شد. ` + baseExplanation;
+                }
+            } else {
+                explanation = premixSplitNotice + baseExplanation;
+            }
+
+            newDose = Math.round(effectiveDose * finalMultiplier);
             
             if (isBIDTo) {
                 let amDose = Math.round(newDose * 0.5);
                 let pmDose = newDose - amDose;
-                explanation += `\n[توزیع دوز مقصد BID]: پیشنهاد می‌شود دوز کل به صورت ۵۰:۵۰ تقسیم گردد (${amDose} واحد صبح / ${pmDose} واحد شب) یا طبق متد بالینی ۲/۳ صبح و ۱/۳ شب تجویز شود.`;
+                explanation += `\n\n[توزیع دوز مقصد BID]: پیشنهاد می‌شود دوز کل به صورت ۵۰:۵۰ تقسیم گردد (${amDose} واحد صبح / ${pmDose} واحد شب) یا طبق متد بالینی ۲/۳ صبح و ۱/۳ شب تجویز شود.`;
             }
         }
 
