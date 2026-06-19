@@ -180,7 +180,7 @@
                 <option value="novomix">نوومیکس ۳۰ (NovoMix)</option>
                 <option value="humalog_mix">هومالوگ میکس (Humalog Mix)</option>
                 <option value="ryzodeg">ریزودگ (Ryzodeg)</option>
-                <option value="human_mix">مخلوط انسانی ۷۰/۳۰ (Human Mix)</option>
+                <option value="human_mix">مخلوط انسانی ۷0/۳۰ (Human Mix)</option>
             </optgroup>
             <optgroup label="انسولین‌های سریع‌الاثر (Bolus)">
                 <option value="apidra_novorapid">آنالوگ سریع (NovoRapid / Apidra)</option>
@@ -231,7 +231,7 @@
 </div>
 
 <script>
-    // دسته‌بندی علمی انواع انسولین جهت قرنطینه و فیلترینگ متقابل
+    // دسته‌بندی علمی انواع انسولین جهت ایزوله‌سازی
     function getGroupType(val) {
         if(['lantus','toujeo','tresiba','levemir','nph_basal'].includes(val)) return 'basal';
         if(['novomix','humalog_mix','ryzodeg','human_mix'].includes(val)) return 'premix';
@@ -245,68 +245,40 @@
         const insToSelect = document.getElementById('insTo');
         
         let valFrom = insFromSelect.value;
-        let valTo = insToSelect.value;
         let fromGroup = getGroupType(valFrom);
-        let toGroup = getGroupType(valTo);
 
-        // مدیریت تغییر خودکار در صورت تطابق نادرست اولیه بین گروه بولوس و سایرین
-        if (fromGroup === 'bolus' && toGroup !== 'bolus') {
-            for (let opt of insToSelect.options) {
-                if (getGroupType(opt.value) === 'bolus' && opt.value !== valFrom) {
-                    insToSelect.value = opt.value;
-                    valTo = opt.value;
-                    toGroup = 'bolus';
-                    break;
-                }
-            }
-        } else if (fromGroup !== 'bolus' && toGroup === 'bolus') {
-            for (let opt of insToSelect.options) {
-                if (getGroupType(opt.value) !== 'bolus' && opt.value !== valFrom) {
-                    insToSelect.value = opt.value;
-                    valTo = opt.value;
-                    toGroup = getGroupType(opt.value);
-                    break;
-                }
-            }
-        } else if (valFrom === valTo) {
-            for (let opt of insToSelect.options) {
-                if (opt.value !== valFrom) {
-                    const optGroup = getGroupType(opt.value);
-                    if ((fromGroup === 'bolus' && optGroup === 'bolus') || (fromGroup !== 'bolus' && optGroup !== 'bolus')) {
-                        insToSelect.value = opt.value;
-                        valTo = opt.value;
-                        toGroup = optGroup;
-                        break;
-                    }
-                }
-            }
-        }
-
-        // قفل و فیلتر کردن متقابل دوطرفه کرکره مقصد (حذف بولوس در صورت انتخاب پایه/میکس/سولیکوآ و بالعکس)
+        // ۱. فیلتر کردن هوشمند و یک‌طرفه کرکره مقصد (insTo) بر اساس انتخاب کرکره اول
         for (let opt of insToSelect.options) {
             const optGroup = getGroupType(opt.value);
             let isCompatible = true;
+
+            // قانون اول: عدم امکان انتخاب دقیقاً همان انسولین در مبدأ و مقصد
             if (valFrom === opt.value) isCompatible = false;
+
+            // قانون دوم: اگر در کرکره اول بولوس انتخاب شد، در کرکره دوم بقیه گروه‌ها (پایه/میکس/سولیکوآ) حذف شوند
             if (fromGroup === 'bolus' && optGroup !== 'bolus') isCompatible = false;
+
+            // قانون سوم: اگر در کرکره اول بولوس انتخاب نشد، انسولین‌های بولوس از کرکره دوم کاملاً حذف شوند
             if (fromGroup !== 'bolus' && optGroup === 'bolus') isCompatible = false;
 
             opt.disabled = !isCompatible;
             opt.style.display = isCompatible ? 'block' : 'none';
         }
 
-        // قفل و فیلتر کردن متقابل دوطرفه کرکره مبدأ جهت یکپارچگی انتخاب‌ها
-        for (let opt of insFromSelect.options) {
-            const optGroup = getGroupType(opt.value);
-            let isCompatible = true;
-            if (valTo === opt.value) isCompatible = false;
-            if (toGroup === 'bolus' && optGroup !== 'bolus') isCompatible = false;
-            if (toGroup !== 'bolus' && optGroup === 'bolus') isCompatible = false;
-
-            opt.disabled = !isCompatible;
-            opt.style.display = isCompatible ? 'block' : 'none';
+        // ۲. بازنشانی خودکار و هوشمند مقدار کرکره دوم در صورت مخفی/غیرفعال شدن گزینه فعلی آن
+        let currentToOpt = insToSelect.options[insToSelect.selectedIndex];
+        if (!currentToOpt || currentToOpt.disabled || currentToOpt.style.display === 'none') {
+            for (let opt of insToSelect.options) {
+                if (!opt.disabled && opt.style.display !== 'none') {
+                    insToSelect.value = opt.value;
+                    break;
+                }
+            }
         }
 
-        // بارگذاری هوشمند گایدلاین‌های مربوطه
+        let valTo = insToSelect.value;
+
+        // ۳. بارگذاری داینامیک گایدلاین‌ها بر اساس وضعیت نهایی انتخاب‌ها
         const guidelineSelect = document.getElementById('guideline');
         const previousSelection = guidelineSelect.value;
         guidelineSelect.innerHTML = '';
@@ -328,7 +300,7 @@
             }
         }
 
-        // کنترل نمایش فیلدهای فرکانس تزریق بر اساس نوع انسولین
+        // ۴. کنترل نمایش فیلدهای فرکانس تزریق بر اساس نوع انسولین فعال
         const strictlyOnceDaily = ['toujeo', 'tresiba', 'soliqua_50', 'soliqua_33'];
         
         const freqFromBox = document.getElementById('freqFromBox');
@@ -340,14 +312,14 @@
         }
 
         const freqToBox = document.getElementById('freqToBox');
-        if (!strictlyOnceDaily.includes(valTo) && toGroup !== 'bolus') {
+        if (!strictlyOnceDaily.includes(valTo) && getGroupType(valTo) !== 'bolus') {
             freqToBox.style.display = 'block';
         } else {
             freqToBox.style.display = 'none';
             document.getElementById('freqTo').value = '1';
         }
 
-        // کنترل جعبه استراتژی کاهش دوز
+        // ۵. کنترل نمایش و مقادیر پیش‌فرض جعبه استراتژی کاهش دوز
         const strategyBox = document.getElementById('strategyBox');
         if (valTo.includes('soliqua') || fromGroup === 'bolus') {
             strategyBox.style.display = 'none';
@@ -361,14 +333,14 @@
             if (isBIDFrom) {
                 strategySelect.value = "0.8"; 
             } else if (isBIDTo) {
-                strategySelect.value = "1.0"; // پیش‌فرض سوییچ معادل برای تبدیل QD به BID
+                strategySelect.value = "1.0";
             }
             
             updateStrategies();
         }
     }
 
-    // به‌روزرسانی ادبیات علمی و پیام‌های انتخابی در منوی کاهش دوز
+    // به‌روزرسانی متون و ادبیات علمی استراتژی‌ها
     function updateStrategies() {
         const guide = document.getElementById('guideline').value;
         const strategySelect = document.getElementById('strategy');
@@ -401,7 +373,7 @@
         }
     }
 
-    // موتور محاسباتی اصلی و اعمال منطق ریاضی ریاضی گایدلاین‌ها
+    // موتور محاسباتی اصلی و اعمال فرمول‌های بالینی
     function convertInsulin() {
         const dose = parseFloat(document.getElementById('currentDose').value);
         const insFrom = document.getElementById('insFrom').value;
@@ -424,12 +396,12 @@
         const fromGroup = getGroupType(insFrom);
         const toGroup = getGroupType(insTo);
 
-        // ۱. سناریوی تعویض بولوس به بولوس (ایزوله کامل)
+        // ۱. سناریوی تعویض بولوس به بولوس
         if (fromGroup === 'bolus') {
             newDose = Math.round(dose);
-            explanation = "تبدیل انسولین‌های سریع‌الاثر/بولوس (Short/Rapid-acting): طبق راهنماهای بالینی، تعویض بین آنالوگ‌های سریع هم‌گروه (مانند نوورپید به آپیدرا یا برعکس) کاملاً به صورت مستقیم و واحدبه‌واحد (1:1) انجام می‌پذیرد و تغییر دوز ساختاری ندارد.";
+            explanation = "تبدیل انسولین‌های سریع‌الاثر/بولوس (Short/Rapid-acting): طبق راهنماهای بالینی، تعویض بین آنالوگ‌های سریع هم‌گروه (مانند نوورپید به آپیدرا) کاملاً به صورت مستقیم و واحدبه‌واحد (1:1) انجام می‌شود و کاهش دوز ساختاری ندارد.";
         }
-        // ۲. سناریوی اختصاصی قلم زرد سولیکوآ
+        // ۲. سولیکوآ ۱۰۰/۵۰ (قلم زرد)
         else if (insTo === 'soliqua_50') {
             if (dose >= 20 && dose <= 30) {
                 newDose = dose;
@@ -441,11 +413,9 @@
                 newDose = 30;
                 explanation = "دوز انسولین قبلی بالاتر از سقف شروع قلم زرد است؛ ارزیابی سوییچ مستقیم به قلم ۱۰۰/۳۳ (زیتونی) توصیه می‌شود.";
             }
-            if (isBIDFrom) {
-                explanation += " [توجه: به دلیل رژیم BID قبلی بیمار، دوز ورودی به عنوان مجموع TDD لحاظ شده است].";
-            }
+            if (isBIDFrom) explanation += " [توجه: مجموع دوز ۲۴ ساعته قبلی ملاک محاسبه قرار گرفته است].";
         } 
-        // ۳. سناریوی اختصاصی قلم زیتونی سولیکوآ
+        // ۳. سولیکوآ ۱۰۰/۳۳ (قلم زیتونی)
         else if (insTo === 'soliqua_33') {
             if (insFrom === 'soliqua_50') {
                 if (dose >= 40) {
@@ -462,11 +432,9 @@
                 newDose = 30;
                 explanation = "شروع پیش‌فرض قلم زیتونی سولیکوآ طبق راهنمای کلینیکال دارو ۳۰ واحد می‌باشد.";
             }
-            if (isBIDFrom) {
-                explanation += " [توجه: دوز بر اساس مجموع TDD محاسبه شده است].";
-            }
+            if (isBIDFrom) explanation += " [توجه: دوز بر اساس مجموع TDD محاسبه شده است].";
         } 
-        // ۴. منطق محاسبات عمومی و اختصاصی سایر انسولین‌ها بر اساس گایدلاین‌ها
+        // ۴. محاسبات عمومی سایر گروه‌ها
         else {
             let finalMultiplier = initialMultiplier;
 
@@ -476,7 +444,7 @@
             } else if (isBIDTo) {
                 if (initialMultiplier === 1.0) {
                     finalMultiplier = 1.0;
-                    explanation = "دستورالعمل بالینی در تبدیل یک‌بار به دوبار در روز (QD به BID): در این نوع سوییچ برعکس حالت قبل، دوز کل روزانه (TDD) نیازی به کاهش پیش‌فرض ندارد و تبدیل ۱:۱ توصیه اصلی گایدلاین‌ها است؛ زیرا شکستن و تقسیم دوز به دو نوبت، خودبه‌خود از تمرکز پیک غلظتی انسولین در یک زمان کاسته و ریسک افت قند خون را به شدت کنترل می‌کند. ";
+                    explanation = "دستورالعمل بالینی در تبدیل یک‌بار به دوبار در روز (QD به BID): در این نوع سوییچ، دوز کل روزانه (TDD) نیازی به کاهش پیش‌فرض ندارد و تبدیل ۱:۱ توصیه اصلی گایدلاین‌ها است؛ زیرا شکستن و تقسیم دوز به دو نوبت، خودبه‌خود از تمرکز پیک غلظتی انسولین در یک زمان کاسته و ریسک افت قند خون را به شدت کنترل می‌کند. ";
                 } else {
                     finalMultiplier = initialMultiplier;
                     explanation = `محاسبه دوز بر اساس تعدیل احتیاطی انتخاب‌شده با ضریب ${finalMultiplier} جهت انتقال به رژیم BID انجام شد. `;
@@ -528,7 +496,6 @@
 
             newDose = Math.round(dose * finalMultiplier);
             
-            // نمایش پیشنهاد توزیع دوز در صورت تبدیل به رژیم دوبار در روز
             if (isBIDTo) {
                 let amDose = Math.round(newDose * 0.5);
                 let pmDose = newDose - amDose;
@@ -536,7 +503,6 @@
             }
         }
 
-        // رندر کردن نتایج نهایی بر روی رابط کاربری
         document.getElementById('resultText').innerText = `${newDose} واحد`;
         document.getElementById('descText').innerText = explanation;
         document.getElementById('resultBox').style.display = 'block';
