@@ -1,0 +1,21 @@
+{
+  "short_name": "مبدل انسولین",
+  "name": "سامانه جامع و هوشمند تبدیل انسولین",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "index.html",
+  "background_color": "#eef2f7",
+  "theme_color": "#0056b3",
+  "display": "standalone",
+  "orientation": "portrait"
+}
