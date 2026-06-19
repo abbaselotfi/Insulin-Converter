@@ -143,7 +143,8 @@
             </optgroup>
             <optgroup label="انسولین‌های مخلوط (Premixed)">
                 <option value="novomix">نوومیکس ۳۰ (NovoMix)</option>
-                <option value="humalog_mix">هومالوگ میکس (Humalog Mix)</option>
+                <option value="humalog_mix_25">هومالوگ میکس ۲۵ (Humalog Mix 25)</option>
+                <option value="humalog_mix_50">هومالوگ میکس ۵۰ (Humalog Mix 50)</option>
                 <option value="ryzodeg">ریزودگ (Ryzodeg)</option>
                 <option value="human_mix">مخلوط انسانی ۷۰/۳۰ (Human Mix)</option>
             </optgroup>
@@ -158,7 +159,8 @@
         <label for="freqFrom">⏱️ فرکانس تزریق انسولین مبدأ:</label>
         <select id="freqFrom" onchange="updateRegimen()">
             <option value="1">۱ بار در روز (QD)</option>
-            <option value="2">۲ بار در روز (BID - مجموع دوز ۲۴ ساعته)</option>
+            <option value="2">۲ بار در روز (BID)</option>
+            <option value="3">۳ بار در روز (TID)</option>
         </select>
     </div>
 
@@ -178,7 +180,8 @@
             </optgroup>
             <optgroup label="انسولین‌های مخلوط (Premixed)">
                 <option value="novomix">نوومیکس ۳۰ (NovoMix)</option>
-                <option value="humalog_mix">هومالوگ میکس (Humalog Mix)</option>
+                <option value="humalog_mix_25">هومالوگ میکس ۲۵ (Humalog Mix 25)</option>
+                <option value="humalog_mix_50">هومالوگ میکس ۵۰ (Humalog Mix 50)</option>
                 <option value="ryzodeg">ریزودگ (Ryzodeg)</option>
                 <option value="human_mix">مخلوط انسانی ۷۰/۳۰ (Human Mix)</option>
             </optgroup>
@@ -194,6 +197,7 @@
         <select id="freqTo" onchange="updateRegimen()">
             <option value="1">۱ بار در روز (QD)</option>
             <option value="2">۲ بار در روز (BID)</option>
+            <option value="3">۳ بار در روز (TID)</option>
         </select>
     </div>
 
@@ -233,7 +237,7 @@
 <script>
     function getGroupType(val) {
         if(['lantus','toujeo','tresiba','levemir','nph_basal'].includes(val)) return 'basal';
-        if(['novomix','humalog_mix','ryzodeg','human_mix'].includes(val)) return 'premix';
+        if(['novomix','humalog_mix_25','humalog_mix_50','ryzodeg','human_mix'].includes(val)) return 'premix';
         if(val === 'soliqua_50' || val === 'soliqua_33') return 'soliqua';
         if(val === 'apidra_novorapid' || val === 'regular') return 'bolus';
         return 'basal';
@@ -285,7 +289,9 @@
         }
 
         let valTo = insToSelect.value;
+        let toGroup = getGroupType(valTo);
 
+        // بروزرسانی داینامیک منوی گایدلاین‌ها
         const guidelineSelect = document.getElementById('guideline');
         const previousSelection = guidelineSelect.value;
         guidelineSelect.innerHTML = '';
@@ -309,20 +315,54 @@
 
         const strictlyOnceDaily = ['toujeo', 'tresiba', 'soliqua_50', 'soliqua_33'];
         
+        // مدیریت کرکره فرکانس مبدأ
         const freqFromBox = document.getElementById('freqFromBox');
+        const freqFromSelect = document.getElementById('freqFrom');
         if (!strictlyOnceDaily.includes(valFrom) && fromGroup !== 'bolus') {
             freqFromBox.style.display = 'block';
+            
+            // مدیریت گزینه TID (۳ بار در روز) برای مبدأ
+            if (fromGroup === 'premix' && valFrom !== 'ryzodeg') {
+                if (freqFromSelect.options.length < 3) {
+                    let opt = document.createElement('option');
+                    opt.value = '3';
+                    opt.text = '۳ بار در روز (TID)';
+                    freqFromSelect.add(opt);
+                }
+            } else {
+                if (freqFromSelect.options.length > 2) {
+                    if (freqFromSelect.value === '3') freqFromSelect.value = '2';
+                    freqFromSelect.remove(2);
+                }
+            }
         } else {
             freqFromBox.style.display = 'none';
-            document.getElementById('freqFrom').value = '1';
+            freqFromSelect.value = '1';
         }
 
+        // مدیریت کرکره فرکانس مقصد
         const freqToBox = document.getElementById('freqToBox');
-        if (!strictlyOnceDaily.includes(valTo) && getGroupType(valTo) !== 'bolus') {
+        const freqToSelect = document.getElementById('freqTo');
+        if (!strictlyOnceDaily.includes(valTo) && toGroup !== 'bolus') {
             freqToBox.style.display = 'block';
+            
+            // مدیریت گزینه TID (۳ بار در روز) برای مقصد
+            if (toGroup === 'premix' && valTo !== 'ryzodeg') {
+                if (freqToSelect.options.length < 3) {
+                    let opt = document.createElement('option');
+                    opt.value = '3';
+                    opt.text = '۳ بار در روز (TID)';
+                    freqToSelect.add(opt);
+                }
+            } else {
+                if (freqToSelect.options.length > 2) {
+                    if (freqToSelect.value === '3') freqToSelect.value = '2';
+                    freqToSelect.remove(2);
+                }
+            }
         } else {
             freqToBox.style.display = 'none';
-            document.getElementById('freqTo').value = '1';
+            freqToSelect.value = '1';
         }
 
         const strategyBox = document.getElementById('strategyBox');
@@ -330,17 +370,6 @@
             strategyBox.style.display = 'none';
         } else {
             strategyBox.style.display = 'block';
-            
-            const isBIDFrom = (freqFromBox.style.display !== 'none' && document.getElementById('freqFrom').value === '2');
-            const isBIDTo = (freqToBox.style.display !== 'none' && document.getElementById('freqTo').value === '2');
-            const strategySelect = document.getElementById('strategy');
-            
-            if (isBIDFrom) {
-                strategySelect.value = "0.8"; 
-            } else if (isBIDTo) {
-                strategySelect.value = "1.0"; // برای حالت QD به BID پیش‌فرض دوز معادل است
-            }
-            
             updateStrategies();
         }
     }
@@ -350,10 +379,10 @@
         const strategySelect = document.getElementById('strategy');
         if (!strategySelect) return;
 
-        const freqFromBox = document.getElementById('freqFromBox');
-        const freqToBox = document.getElementById('freqToBox');
-        const isBIDFrom = (freqFromBox && freqFromBox.style.display !== 'none' && document.getElementById('freqFrom').value === '2');
-        const isBIDTo = (freqToBox && freqToBox.style.display !== 'none' && document.getElementById('freqTo').value === '2');
+        const isBIDFrom = (document.getElementById('freqFromBox').style.display !== 'none' && document.getElementById('freqFrom').value === '2');
+        const isTIDFrom = (document.getElementById('freqFromBox').style.display !== 'none' && document.getElementById('freqFrom').value === '3');
+        const isBIDTo = (document.getElementById('freqToBox').style.display !== 'none' && document.getElementById('freqTo').value === '2');
+        const isTIDTo = (document.getElementById('freqToBox').style.display !== 'none' && document.getElementById('freqTo').value === '3');
 
         let guideName = '';
         if (guide === 'ada') guideName = 'ADA';
@@ -362,22 +391,29 @@
         if (guide === 'nice') guideName = 'NICE';
         if (guide === 'sanofi') guideName = 'Sanofi';
 
-        if (isBIDFrom) {
+        if (isTIDFrom) {
+            strategySelect.options[0].text = `کاهش ۲۰ درصدی دوز (رویکرد الزامی گایدلاین‌ها در رژیم مبدأ TID)`;
+            strategySelect.options[1].text = `پایش مستقیم (عدم توصیه - خطر شدید هیپوگلیسمی)`;
+            strategySelect.options[2].text = `کاهش ۱۵ درصدی دوز (حداقل تعدیل محافظه‌کارانه)`;
+            strategySelect.value = "0.8";
+        } else if (isBIDFrom) {
             strategySelect.options[0].text = `کاهش ۲۰ درصدی دوز (رویکرد الزامی بر اساس رژیم BID مبدأ)`;
             strategySelect.options[1].text = `پایش مستقیم (توصیه نمی‌شود - ریسک بالای هیپوگلیسمی)`;
             strategySelect.options[2].text = `کاهش ۱۵ درصدی دوز (حداقل تعدیل محافظه‌کارانه)`;
-        } else if (isBIDTo) {
-            strategySelect.options[0].text = `کاهش ۲۰ درصدی دوز (رویکرد فوق‌محافظه‌کارانه در رژیم مقصد BID)`;
+            strategySelect.value = "0.8";
+        } else if (isTIDTo || isBIDTo) {
+            strategySelect.options[0].text = `کاهش ۲۰ درصدی دوز (رویکرد فوق‌محافظه‌کارانه در رژیم مقصد چندتزریقی)`;
             strategySelect.options[1].text = `تجویز دوز معادل ۱:۱ و تقسیم آن (رویکرد استاندارد گایدلاین‌ها)`;
             strategySelect.options[2].text = `کاهش ۱۵ درصدی دوز (تعدیل احتیاطی بالینی)`;
+            strategySelect.value = "1.0";
         } else {
             strategySelect.options[0].text = `کاهش ۲۰ درصدی دوز (رویکرد محافظه‌کارانه بر اساس گایدلاین ${guideName})`;
             strategySelect.options[1].text = `پایش مستقیم بالینی و تجویز دوز معادل بر اساس گایدلاین ${guideName}`;
             strategySelect.options[2].text = `کاهش ۱۵ درصدی دوز (تعدیل استاندارد بالینی بر اساس گایدلاین ${guideName})`;
+            strategySelect.value = "1.0";
         }
     }
 
-    // لایه‌بندی ماتریسی و کاملاً مهندسی‌شده موتور محاسباتی
     function convertInsulin() {
         const dose = parseFloat(document.getElementById('currentDose').value);
         const insFrom = document.getElementById('insFrom').value;
@@ -385,7 +421,10 @@
         const guide = document.getElementById('guideline').value;
         
         const isBIDFrom = (document.getElementById('freqFromBox').style.display !== 'none' && document.getElementById('freqFrom').value === '2');
+        const isTIDFrom = (document.getElementById('freqFromBox').style.display !== 'none' && document.getElementById('freqFrom').value === '3');
+        
         const isBIDTo = (document.getElementById('freqToBox').style.display !== 'none' && document.getElementById('freqTo').value === '2');
+        const isTIDTo = (document.getElementById('freqToBox').style.display !== 'none' && document.getElementById('freqTo').value === '3');
         
         let initialMultiplier = parseFloat(document.getElementById('strategy').value);
 
@@ -396,27 +435,40 @@
 
         let newDose = 0;
         let explanation = "";
+        let fromGroup = getGroupType(insFrom);
+        let toGroup = getGroupType(insTo);
 
-        const fromGroup = getGroupType(insFrom);
-        const toGroup = getGroupType(insTo);
-
+        // لایه اول: استخراج دوز مؤثر (جداسازی بخش بیزال در صورت نیاز)
         let effectiveDose = dose;
         let premixSplitNotice = "";
         
         if (fromGroup === 'premix' && (toGroup === 'basal' || toGroup === 'soliqua')) {
-            effectiveDose = dose * 0.70;
-            premixSplitNotice = `با توجه به اینکه انسولین مبدأ از نوع مخلوط (Premix) است، ابتدا سهم ۷۰ درصدی بخش پایه‌ای (بیزال) آن یعنی ${effectiveDose.toFixed(1)} واحد استخراج گردید. `;
+            let premixFactor = 0.70; // پیش‌فرض برای نوومیکس، ریزودگ و میکس انسانی
+            let brandName = "نوومیکس/میکس انسانی/ریزودگ (نسبت ۷۰٪ بیزال)";
+            
+            if (insFrom === 'humalog_mix_25') {
+                premixFactor = 0.75;
+                brandName = "هومالوگ میکس ۲۵ (نسبت ۷۵٪ بیزال)";
+            } else if (insFrom === 'humalog_mix_50') {
+                premixFactor = 0.50;
+                brandName = "هومالوگ میکس ۵۰ (نسبت ۵۰٪ بیزال)";
+            }
+            
+            effectiveDose = dose * premixFactor;
+            premixSplitNotice = `با توجه به اینکه انسولین مبدأ از نوع مخلوط ${brandName} است، ابتدا سهم بخش پایه‌ای (بیزال) آن یعنی ${effectiveDose.toFixed(1)} واحد استخراج گردید. `;
         }
 
+        // لایه دوم: موتور محاسباتی کلینیکال ماتریسی
+        
         // ۱. تعویض بولوس به بولوس
         if (fromGroup === 'bolus') {
             newDose = Math.round(dose);
-            explanation = "تبدیل انسولین‌های سریع‌الاثر/بولوس (Short/Rapid-acting): طبق راهنماهای بالینی، تعویض بین آنالوگ‌های سریع هم‌گروه (مانند نوورپید به آپیدرا) کاملاً به صورت مستقیم و واحدبه‌واحد (1:1) انجام می‌شود و کاهش دوز ساختاری ندارد.";
+            explanation = "تبدیل انسولین‌های سریع‌الاثر/بولوس: طبق راهنماهای بالینی، تعویض بین آنالوگ‌های سریع هم‌گروه (مانند نوورپید به آپیدرا) کاملاً به صورت مستقیم و واحدبه‌واحد (1:1) انجام می‌شود.";
         }
-        // ۲. سولیکوآ ۱۰۰/۵۰ (قلم زرد)
+        // ۲. سوییچ به سولیکوآ ۱۰۰/۵۰ (قلم زرد)
         else if (insTo === 'soliqua_50') {
             if (effectiveDose >= 20 && effectiveDose <= 30) {
-                newDose = effectiveDose;
+                newDose = Math.round(effectiveDose);
                 explanation = premixSplitNotice + "سوییچ به سولیکوآ ۱۰۰/۵۰ (قلم زرد). طبق پروتکل رسمی Sanofi/EMA، برای دوز انسولین پایه بین ۲۰ تا ۳۰ واحد، شروع درمان بر مبنای دوز معادل انجام می‌شود.";
             } else if (effectiveDose < 20) {
                 newDose = 10;
@@ -426,16 +478,11 @@
                 explanation = premixSplitNotice + "دوز انسولین پایه محاسباتی بالاتر از سقف شروع قلم زرد است؛ ارزیابی سوییچ مستقیم به قلم ۱۰۰/۳۳ (زیتونی) توصیه می‌شود.";
             }
         } 
-        // ۳. سولیکوآ ۱۰۰/۳۳ (قلم زیتونی)
+        // ۳. سوییچ به سولیکوآ ۱۰۰/۳۳ (قلم زیتونی)
         else if (insTo === 'soliqua_33') {
             if (insFrom === 'soliqua_50') {
-                if (dose >= 40) {
-                    newDose = 40;
-                    explanation = "طبق گایدلاین رسمی، سقف تیتراسیون قلم زرد ۴۰ واحد است. برای دوزهای بالاتر، بیمار باید با دوز ۴۰ واحد روی قلم زیتونی (۱۰۰/۳۳) سوییچ شود.";
-                } else {
-                    newDose = dose;
-                    explanation = "انتقال بین دو قلم سولیکوآ بر اساس دوز جاری بیمار تنظیم شد.";
-                }
+                newDose = (dose >= 40) ? 40 : Math.round(dose);
+                explanation = (dose >= 40) ? "طبق گایدلاین رسمی، سقف تیتراسیون قلم زرد ۴۰ واحد است. برای دوزهای بالاتر، بیمار باید با دوز ۴۰ واحد روی قلم زیتونی سوییچ شود." : "انتقال بین دو قلم سولیکوآ بر اساس دوز جاری بیمار تنظیم شد.";
             } else if (effectiveDose >= 30) {
                 newDose = 30;
                 explanation = premixSplitNotice + "سوییچ به سولیکوآ ۱۰۰/۳۳ (قلم زیتونی). برای دوزهای مساوی یا بالای ۳۰ واحد پایه، دوز شروع استاندارد پروتکل ۳۰ واحد است.";
@@ -444,19 +491,45 @@
                 explanation = premixSplitNotice + "شروع پیش‌فرض قلم زیتونی سولیکوآ طبق راهنمای کلینیکال دارو ۳۰ واحد می‌باشد.";
             }
         } 
-        // ۴. محاسبات عمومی با اصلاح معماری لایه‌ای (تداخل فرکانس و گایدلاین برطرف شد)
+        // ۴. سناریوی معکوس: تبدیل بیزال به میکس (اضافه شدن بخش پراندیال)
+        else if (fromGroup === 'basal' && toGroup === 'premix') {
+            let finalMultiplier = initialMultiplier;
+            let safetyWarning = "";
+
+            if (insTo === 'humalog_mix_50') {
+                finalMultiplier = Math.min(finalMultiplier, 0.80); 
+                safetyWarning = "⚠️ هشدار اختصاصی: انسولین مقصد (هومالوگ میکس ۵۰) حاوی ۵۰٪ انسولین سریع‌الاثر است. جهت پیشگیری از هیپوگلیسمی حاد بعد از غذا، کاهش دوز ۲۰٪ به صورت پیش‌فرض اعمال شد. ";
+            }
+
+            newDose = Math.round(dose * finalMultiplier);
+            explanation = safetyWarning + `سوییچ از انسولین پایه به انسولین میکس با ضریب ${finalMultiplier} انجام شد. دوز کل جدید روزانه ${newDose} واحد می‌باشد. `;
+
+            // توزیع دوز بر اساس فرکانس مقصد
+            if (isBIDTo) {
+                let amDose = Math.round(newDose * 0.66); // نسبت ۲/۳ صبح
+                let pmDose = newDose - amDose;          // نسبت ۱/۳ شب
+                explanation += `\n\n[توزیع دوز مقصد BID]: پیشنهاد می‌شود دوز کل به صورت ۲/۳ قبل از صبحانه (${amDose} واحد) و ۱/۳ قبل از شام (${pmDose} واحد) تزریق گردد.`;
+            } else if (isTIDTo) {
+                let amDose = Math.round(newDose * 0.40);
+                let noonDose = Math.round(newDose * 0.30);
+                let pmDose = newDose - (amDose + noonDose);
+                explanation += `\n\n[توزیع دوز مقصد TID]: رژیم تهاجمی چندتزریقی؛ دوز کل پیشنهادی بین سه وعده تقسیم شود (${amDose} واحد صبح / ${noonDose} واحد ظهر / ${pmDose} واحد شب). پایش مداوم قند خون (SMBG) الزامی است.`;
+            } else {
+                explanation += `\n\n[توزیع دوز مقصد QD]: دوز کل جدید باید به صورت یک‌بار در روز، دقیقاً قبل از بزرگ‌ترین وعده غذایی بیمار تزریق شود.`;
+            }
+        }
+        // ۵. تبدیل‌های عمومی و چندتزریقی با اعمال ضرایب گایدلاین‌ها
         else {
             let finalMultiplier = initialMultiplier;
             let baseExplanation = "";
 
-            // لایه اول: استخراج قانون گایدلاین بر اساس نوع برند انسولین‌ها
             if (guide === 'ada') {
                 if (insFrom === 'toujeo' && insTo === 'lantus') {
                     finalMultiplier = 0.80; 
-                    baseExplanation = "ملاک اختصاصی ADA: در تبدیل توژئو به لانتوس به دلیل تفاوت فارماکوکینتیک غلظتی، کاهش ۲۰٪ دوز جهت ایمنی الزامی است. ";
+                    baseExplanation = "ملاک اختصاصی ADA: در تبدیل توژئو به لانتوس، اعمال کاهش ۲۰٪ دوز جهت ایمنی الزامی است. ";
                 } else if (insFrom === 'nph_basal' && ['lantus','toujeo','tresiba'].includes(insTo)) {
                     finalMultiplier = 0.80;
-                    baseExplanation = "ملاک اختصاصی ADA: تغییر از NPH به آنالوگ‌های پیشرفته طولانی‌اثر، نیازمند کاهش دوز ۲۰٪ جهت پیشگیری از هیپوگلیسمی است. ";
+                    baseExplanation = "ملاک اختصاصی ADA: تغییر از NPH به آنالوگ‌های پیشرفته طولانی‌اثر، نیازمند کاهش دوز ۲۰٪ است. ";
                 } else if (fromGroup === 'premix' || toGroup === 'premix') {
                     finalMultiplier = 0.80;
                     baseExplanation = "توصیه عمومی ADA: در تعویض رژیم‌های حاوی مخلوط (Premix)، فرمول با اعمال ۲۰٪ کاهش احتیاطی محاسبه می‌شود. ";
@@ -467,7 +540,7 @@
             else if (guide === 'aace') {
                 if (fromGroup !== toGroup || insFrom !== insTo) {
                     finalMultiplier = Math.min(finalMultiplier, 0.80); 
-                    baseExplanation = "الگوریتم محافظه‌کارانه AACE: در سوییچ‌های بین‌کلاسی یا تغییر برند انسولین پایه، کاهش ۲۰ درصدی دوز قفل می‌شود. ";
+                    baseExplanation = "الگوریتم محافظه‌کارانه AACE: در سوییچ‌های بین‌کلاسی یا تغییر برند انسولین، کاهش ۲۰ درصدی دوز قفل می‌شود. ";
                 } else {
                     finalMultiplier = Math.min(finalMultiplier, 0.85);
                     baseExplanation = `رویکرد کنترلی AACE: اعمال کاهش دوز احتیاطی با ضریب ${finalMultiplier} لحاظ گردید. `;
@@ -475,7 +548,7 @@
             } 
             else if (guide === 'canadian') {
                 if (fromGroup === 'basal' && toGroup === 'basal' && insFrom !== 'toujeo') {
-                    baseExplanation = "دستورالعمل Diabetes Canada: این گایدلاین تعویض آنالوگ‌های پایه هم‌سطح (مانند لانتوس و دگلودک) را به صورت مستقیم (1:1) مجاز می‌داند. ";
+                    baseExplanation = "دستورالعمل Diabetes Canada: این گایدلاین تعویض آنالوگ‌های پایه هم‌سطح را به صورت مستقیم (1:1) مجاز می‌داند. ";
                 } else if (insFrom === 'nph_basal') {
                     finalMultiplier = 0.80;
                     baseExplanation = "معیار Diabetes Canada: انتقال دوز از NPH به آنالوگ‌های مدرن شامل کاهش ساختاری ۲۰ درصدی دوز کل است. ";
@@ -492,13 +565,16 @@
                 }
             }
 
-            // لایه دوم: اعمال قوانین حاکم بر فرکانس تزریق (بدون ابطال لایه اول)
-            if (isBIDFrom) {
+            // لایه سوم: اثر فرکانس‌های چندتزریقی مبدأ (TID و BID)
+            if (isTIDFrom) {
+                finalMultiplier = Math.min(finalMultiplier, 0.80);
+                explanation = premixSplitNotice + "تعدیل رژیم پیچیده (TID Premix به Basal QD): با توجه به فرکانس ۳ بار در روز انسولین میکس، سهم پایه استخراج و به دلیل حذف کامل دوزهای سریع‌الاثر، کاهش دوز ۲۰ درصدی جهت پیشگیری از تجمع دوز اعمال شد. پایش قندهای بعد از غذا ضروری است. " + baseExplanation;
+            } else if (isBIDFrom) {
                 finalMultiplier = Math.min(finalMultiplier, 0.80);
                 explanation = premixSplitNotice + "تعدیل فرکانس (BID به QD): به دلیل فرکانس ۲ بار در روز انسولین مبدأ، جهت جلوگیری از تجمع دوز در یک نوبت، کاهش دوز ۲۰ درصدی بر محاسبات اعمال شد. " + baseExplanation;
             } else if (isBIDTo) {
                 if (initialMultiplier === 1.0 && finalMultiplier === 1.0) {
-                    explanation = premixSplitNotice + "دستورالعمل بالینی QD به BID: در این نوع سوییچ، دوز کل روزانه (TDD) نیازی به کاهش پیش‌فرض ندارد و تبدیل ۱:۱ توصیه اصلی است؛ زیرا شکستن دوز به دو نوبت، خودبه‌خود ریسک پیک غلظتی را کنترل می‌کند. " + baseExplanation;
+                    explanation = premixSplitNotice + "دستورالعمل بالینی QD به BID: در این نوع سوییچ، تبدیل ۱:۱ توصیه اصلی است؛ زیرا شکستن دوز به دو نوبت، خودبه‌خود ریسک پیک غلظتی را کنترل می‌کند. " + baseExplanation;
                 } else {
                     explanation = premixSplitNotice + `محاسبه دوز با ضریب تعدیل بالینی نهایی ${finalMultiplier} جهت انتقال ایمن به رژیم مقصد BID انجام شد. ` + baseExplanation;
                 }
@@ -508,7 +584,8 @@
 
             newDose = Math.round(effectiveDose * finalMultiplier);
             
-            if (isBIDTo) {
+            // پیاده‌سازی توزیع دوز مقصد چندتزریقی برای حالت‌های معمولی
+            if (isBIDTo && !isBIDFrom) {
                 let amDose = Math.round(newDose * 0.5);
                 let pmDose = newDose - amDose;
                 explanation += `\n\n[توزیع دوز مقصد BID]: پیشنهاد می‌شود دوز کل به صورت ۵۰:۵۰ تقسیم گردد (${amDose} واحد صبح / ${pmDose} واحد شب) یا طبق متد بالینی ۲/۳ صبح و ۱/۳ شب تجویز شود.`;
