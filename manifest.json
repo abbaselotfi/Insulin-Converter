@@ -1,16 +1,21 @@
 {
   "short_name": "مبدل انسولین",
-  "name": "سامانه جامع و هوشمند تبدیل انسولین",
+  "name": "سامانه جامع و هوشمند تبدیل انسولین بالینی",
+  "description": "ابزار بالینی هوشمند برای تبدیل دوز و سوییچ انواع انسولین بر اساس گایدلاین‌های ADA و AACE",
+  "id": "/Insulin-Converter/",
+  "categories": ["medical", "productivity"],
   "icons": [
     {
       "src": "icon-192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any"
     },
     {
       "src": "icon-512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any"
     }
   ],
   "start_url": "index.html",
