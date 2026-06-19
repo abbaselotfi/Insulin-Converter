@@ -123,21 +123,13 @@
 <body>
 
 <div class="container">
-    <a href="soliqua.html" class="soliqua-nav-btn">📘 راهنمای بالینی و ویژگی‌های هر دو قلم Soliqua</a>
+    <a href="./soliqua.html" class="soliqua-nav-btn">📘 راهنمای بالینی و ویژگی‌های هر دو قلم Soliqua</a>
 
     <h2>سامانه تبدیل انسولین</h2>
-
-    <div class="form-group">
-        <label for="guideline">📚 انتخاب مرجع علمی (گایدلاین):</label>
-        <select id="guideline">
-            <option value="ada">انجمن دیابت آمریکا (ADA)</option>
-            <option value="aace">کالج متخصصان غدد آمریکا (AACE)</option>
-        </select>
-    </div>
     
     <div class="form-group">
         <label for="insFrom">انسولین فعلی (مبدأ):</label>
-        <select id="insFrom">
+        <select id="insFrom" onchange="updateGuidelines()">
             <optgroup label="انسولین‌های ترکیبی مدرن (FRC)">
                 <option value="soliqua_50">سولیکوآ ۱۰۰/۵۰ (قلم زرد/هلویی - دوز ۱۰ تا ۴۰)</option>
                 <option value="soliqua_33">سولیکوآ ۱۰۰/۳۳ (قلم زیتونی - دوز ۳۰ تا ۶۰)</option>
@@ -164,7 +156,7 @@
 
     <div class="form-group">
         <label for="insTo">انسولین جایگزین (مقصد):</label>
-        <select id="insTo">
+        <select id="insTo" onchange="updateGuidelines()">
             <optgroup label="انسولین‌های ترکیبی مدرن (FRC)">
                 <option value="soliqua_50">سولیکوآ ۱۰۰/۵۰ (قلم زرد/هلویی)</option>
                 <option value="soliqua_33" selected>سولیکوآ ۱۰۰/۳۳ (قلم زیتونی)</option>
@@ -203,6 +195,12 @@
         </select>
     </div>
 
+    <div class="form-group">
+        <label for="guideline">📚 انتخاب مرجع علمی (گایدلاین):</label>
+        <select id="guideline">
+            </select>
+    </div>
+
     <button onclick="convertInsulin()">محاسبه تبدیل دقیق</button>
 
     <div class="result-box" id="resultBox">
@@ -212,11 +210,42 @@
     </div>
 
     <div class="alert-text" id="alertBox">
-        <strong>⚠️ هشدار بالینی مهم:</strong> محاسبات بر اساس گایدلاین‌های انتخابی انجام شده است. پایش قند خون تیتراسیون را الزامی می‌سازد.
+        <strong>⚠️ هشدار بالینی مهم:</strong> محاسبات بر اساس مرجع علمی منتخب انجام شده است. پایش قند خون و تیتراسیون توسط پزشک الزامی می‌سازد.
     </div>
 </div>
 
 <script>
+    // سیستم فیلترینگ و هوشمندسازی منوی گایدلاین بر اساس نوع انسولین
+    function updateGuidelines() {
+        const insFrom = document.getElementById('insFrom').value;
+        const insTo = document.getElementById('insTo').value;
+        const guidelineSelect = document.getElementById('guideline');
+        
+        // ذخیره انتخاب قبلی کاربر برای ارتقای تجربه کاربری
+        const previousSelection = guidelineSelect.value;
+        guidelineSelect.innerHTML = '';
+
+        if (insFrom.includes('soliqua') || insTo.includes('soliqua')) {
+            // اگر سولیکوآ در فرآیند تبدیل نقش داشته باشد
+            guidelineSelect.innerHTML = `
+                <option value="sanofi">پروتکل اختصاصی Sanofi / EMA / FDA (پیش‌فرض)</option>
+                <option value="ada">انجمن دیابت آمریکا (ADA)</option>
+            `;
+        } else {
+            // برای تبدیل سایر انسولین‌های جنرال بازار به یکدیگر
+            guidelineSelect.innerHTML = `
+                <option value="ada">انجمن دیابت آمریکا (ADA)</option>
+                <option value="aace">کالج متخصصان غدد آمریکا (AACE)</option>
+                <option value="canadian">دیابت کانادا (Diabetes Canada)</option>
+                <option value="nice">گایدلاین بالینی انگلستان (NICE)</option>
+            `;
+            // بازگرداندن انتخاب قبلی در صورت وجود در لیست جدید
+            if(['ada','aace','canadian','nice'].includes(previousSelection)) {
+                guidelineSelect.value = previousSelection;
+            }
+        }
+    }
+
     function getGroupType(val) {
         if(['lantus','toujeo','tresiba','levemir','nph_basal'].includes(val)) return 'basal';
         if(['novomix','humalog_mix','ryzodeg','human_mix'].includes(val)) return 'premix';
@@ -229,6 +258,7 @@
         const insFrom = document.getElementById('insFrom').value;
         const insTo = document.getElementById('insTo').value;
         const reduction = parseFloat(document.getElementById('strategy').value);
+        const guide = document.getElementById('guideline').value.toUpperCase();
 
         if (isNaN(dose) || dose <= 0) {
             alert('لطفاً دوز معتبری وارد کنید.');
@@ -245,52 +275,50 @@
         const fromGroup = getGroupType(insFrom);
         const toGroup = getGroupType(insTo);
 
-        // منطق اختصاصی تبدیل به سولیکوآ
         if (insTo === 'soliqua_50') {
             if (dose >= 20 && dose <= 30) {
                 newDose = dose;
-                explanation = "سوییچ به سولیکوآ ۱۰۰/۵۰ (قلم زرد). برای بیماران با سابقه درمان انسولین پایه بین ۲۰ تا ۳۰ واحد، شروع واحد به واحد با قلم ۱۰۰/۵۰ پیشنهاد می‌شود.";
+                explanation = `سوییچ به سولیکوآ ۱۰۰/۵۰ (قلم زرد). بر اساس پروتکل مرجع، برای بیماران با سابقه درمان انسولین پایه بین ۲۰ تا ۳۰ واحد، شروع واحد به واحد پیشنهاد می‌شود.`;
             } else if (dose < 20) {
                 newDose = 10;
-                explanation = "با توجه به دوز پایین قبلی، شروع ایمن از کف دوز قلم زرد (۱۰ واحد) توصیه می‌گردد.";
+                explanation = `با توجه به دوز پایین قبلی، شروع ایمن از کف دوز قلم زرد (۱۰ واحد) توصیه می‌گردد.`;
             } else {
                 newDose = 30;
-                explanation = "دوز قبلی برای قلم زرد بالاست؛ پیشنهاد می‌شود وضعیت بیمار برای سوییچ به قلم ۱۰۰/۳۳ (زیتونی) ارزیابی شود.";
+                explanation = `دوز قبلی برای قلم زرد بالاست؛ پیشنهاد می‌شود وضعیت بیمار برای سوییچ مستقیم به قلم ۱۰۰/۳۳ (زیتونی) ارزیابی شود.`;
             }
         } 
         else if (insTo === 'soliqua_33') {
             if (insFrom === 'soliqua_50') {
                 if (dose >= 40) {
                     newDose = 40;
-                    explanation = "طبق پروتکل رسمی، سقف دوز قلم ۱۰۰/۵۰ معادل ۴۰ واحد است. برای ادامه درمان، بیمار باید با دوز ۴۰ واحد روی قلم ۱۰۰/۳۳ (زیتونی) سوییچ شود.";
+                    explanation = `طبق پروتکل رسمی سانوفی، سقف دوز قلم ۱۰۰/۵۰ معادل ۴۰ واحد است. برای ادامه تیتراسیون افزایشی، بیمار باید با دوز ۴۰ واحد روی قلم ۱۰۰/۳۳ (زیتونی) سوییچ شود.`;
                 } else {
                     newDose = dose;
-                    explanation = "انتقال بین دو قلم بر اساس دوز فعلی بیمار تنظیم گردید.";
+                    explanation = `انتقال بین دو قلم بر اساس دوز فعلی بیمار تنظیم گردید.`;
                 }
             } else if (dose >= 30) {
                 newDose = 30;
-                explanation = "سوییچ از انسولین پایه قبلی به سولیکوآ ۱۰۰/۳۳ (قلم زیتونی). برای دوزهای پایه قبلی بالای ۳۰ واحد، دوز شروع استاندارد قلم زیتونی ۳۰ واحد است.";
+                explanation = `سوییچ از انسولین پایه قبلی به سولیکوآ ۱۰۰/۳۳ (قلم زیتونی). برای دوزهای پایه قبلی ۳۰ واحد و بالاتر، دوز شروع استاندارد قلم زیتونی ۳۰ واحد است.`;
             } else {
                 newDose = 30;
-                explanation = "شروع پیش‌فرض قلم ۱۰۰/۳۳ بر اساس گایدلاین سازنده ۳۰ واحد می‌باشد.";
+                explanation = `شروع پیش‌فرض قلم ۱۰۰/۳۳ بر اساس گایدلاین‌های مرجع ۳۰ واحد می‌باشد.`;
             }
         } 
-        // منطق عمومی تبدیل سایر انسولین‌ها
         else {
             newDose = Math.round(dose * reduction);
             let redPercent = Math.round((1 - reduction) * 100);
             
             if (fromGroup === 'toujeo' && insTo === 'lantus') {
                 newDose = Math.round(dose * 0.8);
-                explanation = "تبدیل توژئو به لانتوس: کاهش ۲۰ درصدی دوز جهت جلوگیری از افت قند خون اعمال شد.";
+                explanation = `تبدیل توژئو به لانتوس مطابق رفرنس ${guide}: کاهش ۲۰ درصدی دوز جهت جلوگیری از افت قند خون اعمال شد.`;
             } else if (fromGroup === 'basal' && toGroup === 'premix') {
                 newDose = Math.round(dose * 0.8);
-                explanation = "تغییر از انسولین پایه به پرمیکس/مخلوط: کاهش ۲۰ درصدی اعمال شده و دوز نهایی ترجیحاً تقسیم بر وعده‌ها شود.";
+                explanation = `تغییر از انسولین پایه به پرمیکس/مخلوط مطابق رفرنس ${guide}: کل دوز انسولین پایه قبلی به ۸۰٪ کاهش یافته و ترجیحاً بر اساس ساختار محصول مقصد تقسیم بر وعده‌ها شود.`;
             } else if (fromGroup === 'premix' && toGroup === 'basal') {
                 newDose = Math.round(dose * 0.8);
-                explanation = "تغییر از پرمیکس به پایه: دوز انسولین پایه جدید معادل ۸۰٪ دوز کل پرمیکس قبلی پیشنهاد می‌شود.";
+                explanation = `تغییر از پرمیکس به پایه مطابق رفرنس ${guide}: دوز انسولین پایه جدید معادل ۸۰٪ دوز کل پرمیکس قبلی پیشنهاد می‌شود.`;
             } else {
-                explanation = `تبدیل بر اساس استراتژی منتخب با اعمال ${redPercent}% کاهش دوز احتیاطی انجام شد.`;
+                explanation = `تبدیل بر اساس استراتژی منتخب در رفرنس ${guide} با اعمال ${redPercent}% تنظیم دوز احتیاطی انجام شد.`;
             }
         }
 
@@ -299,6 +327,11 @@
         document.getElementById('resultBox').style.display = 'block';
         document.getElementById('alertBox').style.display = 'block';
     }
+
+    // اجرای خودکار فیلترینگ منو هنگام لود اولیه صفحه
+    window.onload = function() {
+        updateGuidelines();
+    };
 </script>
 </body>
 </html>
