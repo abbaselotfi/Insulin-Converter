@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مبدل جامع و هوشمند انسولین</title>
+    <title>سامانه پیشرفته تبدیل و محاسبه دوز انسولین</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0056b3">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -48,7 +48,7 @@
             color: #0056b3;
             text-align: center;
             margin-bottom: 20px;
-            font-size: 24px;
+            font-size: 22px;
             border-bottom: 2px solid #0056b3;
             padding-bottom: 12px;
         }
@@ -68,7 +68,7 @@
             border: 1px solid #b0c4de;
             border-radius: 8px;
             box-sizing: border-box;
-            font-size: 15px;
+            font-size: 14px;
             font-family: inherit;
             background-color: #fcfdfd;
         }
@@ -118,90 +118,114 @@
             border-left: 4px solid #f5c6cb;
             display: none;
         }
+        .freq-badge {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-top: 5px;
+            border: 1px solid #ffeeba;
+        }
     </style>
-</head>
-<body>
+</div>
 
 <div class="container">
     <a href="./soliqua.html" class="soliqua-nav-btn">📘 راهنمای بالینی و ویژگی‌های هر دو قلم Soliqua</a>
 
-    <h2>سامانه تبدیل انسولین</h2>
+    <h2>سامانه کلینیکال تبدیل انسولین</h2>
     
     <div class="form-group">
-        <label for="insFrom">انسولین فعلی (مبدأ):</label>
-        <select id="insFrom" onchange="updateGuidelines()">
+        <label for="insFrom">انسولین جاری (مبدأ):</label>
+        <select id="insFrom" onchange="updateRegimen()">
             <optgroup label="انسولین‌های ترکیبی مدرن (FRC)">
-                <option value="soliqua_50">سولیکوآ ۱۰۰/۵۰ (قلم زرد/هلویی - دوز ۱۰ تا ۴۰)</option>
-                <option value="soliqua_33">سولیکوآ ۱۰۰/۳۳ (قلم زیتونی - دوز ۳۰ تا ۶۰)</option>
+                <option value="soliqua_50">سولیکوآ ۱۰۰/۵۰ (قلم زرد/هلویی)</option>
+                <option value="soliqua_33">سولیکوآ ۱۰۰/۳۳ (قلم زیتونی)</option>
             </optgroup>
-            <optgroup label="انسولین‌های پایه (Long-Acting / Basal)">
-                <option value="lantus">لانتوس (Glargine U-100) - Lantus</option>
-                <option value="toujeo">توژئو (Glargine U-300) - Toujeo</option>
-                <option value="tresiba">دگلودک (Tresiba / Degludec)</option>
-                <option value="levemir">لِومیر (Detemir) - Levemir</option>
-                <option value="nph_basal">ان‌پی‌اچ (NPH/Insulin Isophane)</option>
+            <optgroup label="انسولین‌های پایه (Basal)">
+                <option value="lantus" selected>لانتوس (Glargine U-100)</option>
+                <option value="toujeo">توژئو (Glargine U-300)</option>
+                <option value="tresiba">دگلودک (Tresiba)</option>
+                <option value="levemir">لِومیر (Detemir)</option>
+                <option value="nph_basal">ان‌پی‌اچ (NPH)</option>
             </optgroup>
-            <optgroup label="انسولین‌های مخلوط (Premixed / Bi-Phasic)">
-                <option value="novomix">نوومیکس ۳۰ (NovoMix 30)</option>
-                <option value="humalog_mix">هومالوگ میکس ۲۵ و ۵۰ (Humalog Mix)</option>
+            <optgroup label="انسولین‌های مخلوط (Premixed)">
+                <option value="novomix">نوومیکس ۳۰ (NovoMix)</option>
+                <option value="humalog_mix">هومالوگ میکس (Humalog Mix)</option>
                 <option value="ryzodeg">ریزودگ (Ryzodeg)</option>
-                <option value="human_mix">مخلوط انسانی ۷۰/۳۰ (Human Mix 70/30)</option>
+                <option value="human_mix">مخلوط انسانی ۷۰/۳۰ (Human Mix)</option>
             </optgroup>
-            <optgroup label="انسولین‌های کوتاه‌سوز و سریع‌الاثر (Bolus / Short-Acting)">
-                <option value="apidra_novorapid">اسپارت/رپید/گلولیژن (NovoRapid, Apidra, Humalog)</option>
-                <option value="regular">رگولار انسانی (Regular / R)</option>
+            <optgroup label="انسولین‌های سریع‌الاثر (Bolus)">
+                <option value="apidra_novorapid">آنالوگ سریع (NovoRapid / Apidra)</option>
+                <option value="regular">رگولار انسانی (Regular)</option>
             </optgroup>
+        </select>
+    </div>
+
+    <div class="form-group" id="freqFromBox" style="display: none;">
+        <label for="freqFrom">⏱️ فرکانس تزریق انسولین مبدأ:</label>
+        <select id="freqFrom">
+            <option value="1">۱ بار در روز (QD)</option>
+            <option value="2">۲ بار در روز (BID - مجموع دوز ۲۴ ساعته)</option>
         </select>
     </div>
 
     <div class="form-group">
         <label for="insTo">انسولین جایگزین (مقصد):</label>
-        <select id="insTo" onchange="updateGuidelines()">
+        <select id="insTo" onchange="updateRegimen()">
             <optgroup label="انسولین‌های ترکیبی مدرن (FRC)">
                 <option value="soliqua_50">سولیکوآ ۱۰۰/۵۰ (قلم زرد/هلویی)</option>
-                <option value="soliqua_33" selected>سولیکوآ ۱۰۰/۳۳ (قلم زیتونی)</option>
+                <option value="soliqua_33">سولیکوآ ۱۰۰/۳۳ (قلم زیتونی)</option>
             </optgroup>
-            <optgroup label="انسولین‌های پایه (Long-Acting / Basal)">
-                <option value="lantus">لانتوس (Glargine U-100) - Lantus</option>
-                <option value="toujeo">توژئو (Glargine U-300) - Toujeo</option>
-                <option value="tresiba">دگلودک (Tresiba / Degludec)</option>
-                <option value="levemir">لِومیر (Detemir) - Levemir</option>
-                <option value="nph_basal">ان‌پی‌اچ (NPH/Insulin Isophane)</option>
+            <optgroup label="انسولین‌های پایه (Basal)">
+                <option value="lantus">لانتوس (Glargine U-100)</option>
+                <option value="toujeo">توژئو (Glargine U-300)</option>
+                <option value="tresiba">دگلودک (Tresiba)</option>
+                <option value="levemir">لِومیر (Detemir)</option>
+                <option value="nph_basal">ان‌پی‌اچ (NPH)</option>
             </optgroup>
-            <optgroup label="انسولین‌های مخلوط (Premixed / Bi-Phasic)">
-                <option value="novomix">نوومیکس ۳۰ (NovoMix 30)</option>
-                <option value="humalog_mix">هومالوگ میکس ۲۵ و ۵۰ (Humalog Mix)</option>
+            <optgroup label="انسولین‌های مخلوط (Premixed)">
+                <option value="novomix">نوومیکس ۳۰ (NovoMix)</option>
+                <option value="humalog_mix">هومالوگ میکس (Humalog Mix)</option>
                 <option value="ryzodeg">ریزودگ (Ryzodeg)</option>
-                <option value="human_mix">مخلوط انسانی ۷۰/۳۰ (Human Mix 70/30)</option>
+                <option value="human_mix">مخلوط انسانی ۷۰/۳۰ (Human Mix)</option>
             </optgroup>
-            <optgroup label="انسولین‌های کوتاه‌سوز و سریع‌الاثر (Bolus / Short-Acting)">
-                <option value="apidra_novorapid">اسپارت/رپید/گلولیژن (NovoRapid, Apidra, Humalog)</option>
-                <option value="regular">رگولار انسانی (Regular / R)</option>
+            <optgroup label="انسولین‌های سریع‌الاثر (Bolus)">
+                <option value="apidra_novorapid">آنالوگ سریع (NovoRapid / Apidra)</option>
+                <option value="regular">رگولار انسانی (Regular)</option>
             </optgroup>
         </select>
     </div>
 
-    <div class="form-group">
-        <label for="currentDose">💊 دوز کل فعلی بیمار (واحد):</label>
-        <input type="number" id="currentDose" placeholder="مثلاً 30" min="1" max="100">
+    <div class="form-group" id="freqToBox" style="display: none;">
+        <label for="freqTo">⏱️ فرکانس تزریق انسولین مقصد:</label>
+        <select id="freqTo">
+            <option value="1">۱ بار در روز (QD)</option>
+            <option value="2">۲ بار در روز (BID)</option>
+        </select>
     </div>
 
     <div class="form-group">
-        <label for="guideline">📚 انتخاب مرجع علمی (گایدلاین):</label>
+        <label for="currentDose">💊 دوز کل فعلی بیمار در ۲۴ ساعت (Total Daily Dose):</label>
+        <input type="number" id="currentDose" placeholder="مثلاً 30" min="1" max="120">
+    </div>
+
+    <div class="form-group">
+        <label for="guideline">📚 انتخاب گایدلاین مرجع:</label>
         <select id="guideline" onchange="updateStrategies()">
             </select>
     </div>
 
     <div class="form-group" id="strategyBox">
-        <label for="strategy">استراتژی احتیاطی کاهش دوز:</label>
+        <label for="strategy">استراتژی بالینی کاهش دوز:</label>
         <select id="strategy">
-            <option value="0.8">کاهش ۲۰ درصدی دوز (رویکرد محافظه‌کارانه مبتنی بر پروتکل)</option>
-            <option value="1.0">تبدیل واحد به واحد ۱:۱ (تحت پایش مستقیم مبتنی بر پروتکل)</option>
-            <option value="0.85">کاهش ۱۵ درصدی دوز (تعدیل استاندارد بالینی مبتنی بر پروتکل)</option>
+            <option value="0.8">کاهش ۲۰ درصدی دوز</option>
+            <option value="1.0">تبدیل واحد به واحد ۱:۱</option>
+            <option value="0.85">کاهش ۱۵ درصدی دوز</option>
         </select>
     </div>
 
-    <button onclick="convertInsulin()">محاسبه تبدیل دقیق</button>
+    <button onclick="convertInsulin()">محاسبه کلینیکال دوز</button>
 
     <div class="result-box" id="resultBox">
         <div class="result-title">💡 دوز پیشنهادی جدید:</div>
@@ -210,39 +234,83 @@
     </div>
 
     <div class="alert-text" id="alertBox">
-        <strong>⚠️ هشدار بالینی مهم:</strong> محاسبات بر اساس معیارهای ریاضی مرجع منتخب استخراج شده است. تیتراسیون دوز بالینی همواره ارجحیت دارد.
+        <strong>⚠️ هشدار بالینی مهم:</strong> محاسبات بر اساس فرمول‌های ریاضی گایدلاین منتخب استخراج شده است. پاسخ بیولوژیک بیمار و تیتراسیون بالینی همواره ارجحیت دارد.
     </div>
 </div>
 
 <script>
-    function updateGuidelines() {
-        const insFrom = document.getElementById('insFrom').value;
-        const insTo = document.getElementById('insTo').value;
-        const guidelineSelect = document.getElementById('guideline');
-        const strategyBox = document.getElementById('strategyBox');
-        const previousSelection = guidelineSelect.value;
+    function updateRegimen() {
+        const insFromSelect = document.getElementById('insFrom');
+        const insToSelect = document.getElementById('insTo');
         
+        let valFrom = insFromSelect.value;
+        let valTo = insToSelect.value;
+
+        // ممانعت از تبدیل هم‌نام (اگر برابر باشند، گزینه بعدی انتخاب می‌شود)
+        if (valFrom === valTo) {
+            for (let opt of insToSelect.options) {
+                if (opt.value !== valFrom) {
+                    insToSelect.value = opt.value;
+                    valTo = opt.value;
+                    break;
+                }
+            }
+        }
+
+        // فیلترینگ متقابل گزینه‌ها در دو کرکره
+        for (let opt of insToSelect.options) {
+            opt.disabled = (opt.value === valFrom);
+            opt.style.display = (opt.value === valFrom) ? 'none' : 'block';
+        }
+        for (let opt of insFromSelect.options) {
+            opt.disabled = (opt.value === valTo);
+            opt.style.display = (opt.value === valTo) ? 'none' : 'block';
+        }
+
+        // مدیریت پویای منوی گایدلاین‌ها
+        const guidelineSelect = document.getElementById('guideline');
+        const previousSelection = guidelineSelect.value;
         guidelineSelect.innerHTML = '';
 
-        if (insFrom.includes('soliqua') || insTo.includes('soliqua')) {
+        if (valFrom.includes('soliqua') || valTo.includes('soliqua')) {
             guidelineSelect.innerHTML = `
                 <option value="sanofi">پروتکل رسمی Sanofi / EMA / FDA (پیش‌فرض)</option>
-                <option value="ada">انجمن دیابت آمریکا (ADA)</option>
+                <option value="ada">گایدلاین ADA</option>
             `;
         } else {
             guidelineSelect.innerHTML = `
-                <option value="ada">انجمن دیابت آمریکا (ADA)</option>
-                <option value="aace">کالج متخصصان غدد آمریکا (AACE)</option>
-                <option value="canadian">دیابت کانادا (Diabetes Canada)</option>
-                <option value="nice">گایدلاین بالینی انگلستان (NICE)</option>
+                <option value="ada">گایدلاین ADA</option>
+                <option value="aace">گایدلاین AACE</option>
+                <option value="canadian">گایدلاین Diabetes Canada</option>
+                <option value="nice">گایدلاین NICE</option>
             `;
             if(['ada','aace','canadian','nice'].includes(previousSelection)) {
                 guidelineSelect.value = previousSelection;
             }
         }
 
-        // بهبود تجربه کاربری: در سوییچ به سولیکوآ دوزها ثابت است؛ پس فیلد استراتژی دستی پنهان می‌شود.
-        if (insTo.includes('soliqua')) {
+        // مدیریت فیلد تعداد تزریق (ممنوعیت برای توژئو، دگلودک و سولیکوآ)
+        const strictlyOnceDaily = ['toujeo', 'tresiba', 'soliqua_50', 'soliqua_33'];
+        
+        const freqFromBox = document.getElementById('freqFromBox');
+        if (!strictlyOnceDaily.includes(valFrom)) {
+            freqFromBox.style.display = 'block';
+        } else {
+            freqFromBox.style.display = 'none';
+            document.getElementById('freqFrom').value = '1';
+        }
+
+        const freqToBox = document.getElementById('freqToBox');
+        if (!strictlyOnceDaily.includes(valTo)) {
+            freqToBox.style.display = 'block';
+        } else {
+            freqToBox.style.display = 'none';
+            document.getElementById('freqTo').value = '1';
+        }
+
+        // مخفی‌سازی استراتژی دستی در صورت انتخاب سولیکوآ به عنوان مقصد
+        const strategyBox = document.getElementById('strategyBox');
+        if (valTo.includes('soliqua')) {
             strategyBox.style.display = 'none';
         } else {
             strategyBox.style.display = 'block';
@@ -250,7 +318,6 @@
         }
     }
 
-    // ایده طلایی شما: تغییر داینامیک گزینه‌ها با ادبیات تصحیح شده علمی و نام اختصاری گایدلاین
     function updateStrategies() {
         const guide = document.getElementById('guideline').value;
         const strategySelect = document.getElementById('strategy');
@@ -263,9 +330,9 @@
         if (guide === 'nice') guideName = 'NICE';
         if (guide === 'sanofi') guideName = 'Sanofi';
 
-        strategySelect.options[0].text = `کاهش ۲۰ درصدی دوز (رویکرد محافظه‌کارانه مبتنی بر شیوه‌نامه ${guideName})`;
-        strategySelect.options[1].text = `تبدیل واحد به واحد ۱:۱ (تحت پایش مستقیم مبتنی بر شیوه‌نامه ${guideName})`;
-        strategySelect.options[2].text = `کاهش ۱۵ درصدی دوز (تعدیل استاندارد بالینی مبتنی بر شیوه‌نامه ${guideName})`;
+        strategySelect.options[0].text = `کاهش ۲۰ درصدی دوز (رویکرد محافظه‌کارانه بر اساس گایدلاین ${guideName})`;
+        strategySelect.options[1].text = `تبدیل واحد به واحد ۱:۱ (تحت پایش مستقیم بر اساس گایدلاین ${guideName})`;
+        strategySelect.options[2].text = `کاهش ۱۵ درصدی دوز (تعدیل استاندارد بالینی بر اساس گایدلاین ${guideName})`;
     }
 
     function getGroupType(val) {
@@ -281,14 +348,13 @@
         const insTo = document.getElementById('insTo').value;
         const guide = document.getElementById('guideline').value;
         
+        const isBIDFrom = (document.getElementById('freqFromBox').style.display !== 'none' && document.getElementById('freqFrom').value === '2');
+        const isBIDTo = (document.getElementById('freqToBox').style.display !== 'none' && document.getElementById('freqTo').value === '2');
+        
         let initialMultiplier = parseFloat(document.getElementById('strategy').value);
 
         if (isNaN(dose) || dose <= 0) {
             alert('لطفاً دوز معتبری وارد کنید.');
-            return;
-        }
-        if (insFrom === insTo) {
-            alert('انسولین مبدأ و مقصد نمی‌تواند یکسان باشد.');
             return;
         }
 
@@ -298,10 +364,11 @@
         const fromGroup = getGroupType(insFrom);
         const toGroup = getGroupType(insTo);
 
+        // پروتکل اختصاصی سولیکوآ (مقصد)
         if (insTo === 'soliqua_50') {
             if (dose >= 20 && dose <= 30) {
                 newDose = dose;
-                explanation = "سوییچ به سولیکوآ ۱۰۰/۵۰ (قلم زرد). طبق پروتکل رسمی سانوفی/EMA، برای دوزهای انسولین پایه بین ۲۰ تا ۳۰ واحد، شروع درمان به صورت واحد به واحد (1:1) انجام می‌شود.";
+                explanation = "سوییچ به سولیکوآ ۱۰۰/۵۰ (قلم زرد). طبق پروتکل رسمی Sanofi/EMA، برای TDD انسولین پایه بین ۲۰ تا ۳۰ واحد، شروع درمان به صورت ۱:۱ انجام می‌شود.";
             } else if (dose < 20) {
                 newDose = 10;
                 explanation = "به دلیل دوز پایه پایین قبلی (کمتر از ۲۰ واحد)، دوز شروع ایمن از کف دوز قلم زرد یعنی ۱۰ واحد تعیین گردید.";
@@ -309,72 +376,92 @@
                 newDose = 30;
                 explanation = "دوز انسولین قبلی بالاتر از سقف شروع قلم زرد است؛ ارزیابی سوییچ مستقیم به قلم ۱۰۰/۳۳ (زیتونی) توصیه می‌شود.";
             }
+            if (isBIDFrom) {
+                explanation += " [توجه: به دلیل رژیم BID قبلی بیمار، دوز ورودی به عنوان مجموع TDD لحاظ شده است].";
+            }
         } 
         else if (insTo === 'soliqua_33') {
             if (insFrom === 'soliqua_50') {
                 if (dose >= 40) {
                     newDose = 40;
-                    explanation = "طبق گایدلاین رسمی، سقف تیتراسیون قلم زرد ۴۰ واحد است. برای دوزهای بالاتر، بیمار باید دقیقاً با دوز ۴۰ واحد روی قلم زیتونی (۱۰۰/۳۳) سوییچ شود.";
+                    explanation = "طبق گایدلاین رسمی، سقف تیتراسیون قلم زرد ۴۰ واحد است. برای دوزهای بالاتر، بیمار باید با دوز ۴۰ واحد روی قلم زیتونی (۱۰۰/۳۳) سوییچ شود.";
                 } else {
                     newDose = dose;
                     explanation = "انتقال بین دو قلم سولیکوآ بر اساس دوز جاری بیمار تنظیم شد.";
                 }
             } else if (dose >= 30) {
                 newDose = 30;
-                explanation = "سوییچ از انسولین پایه قبلی به سولیکوآ ۱۰۰/۳۳ (قلم زیتونی). برای دوزهای پایه قبلی مساوی یا بالای ۳۰ واحد، دوز شروع استاندارد و ایمن مرجع ۳۰ واحد است.";
+                explanation = "سوییچ به سولیکوآ ۱۰۰/۳۳ (قلم زیتونی). برای دوزهای TDD مساوی یا بالای ۳۰ واحد، دوز شروع استاندارد پروتکل ۳۰ واحد است.";
             } else {
                 newDose = 30;
-                explanation = "شروع پیش‌فرض قلم زیتونی سولیکوآ طبق راهنمای دارو ۳۰ واحد می‌باشد.";
+                explanation = "شروع پیش‌فرض قلم زیتونی سولیکوآ طبق راهنمای کلینیکال دارو ۳۰ واحد می‌باشد.";
+            }
+            if (isBIDFrom) {
+                explanation += " [توجه: دوز بر اساس مجموع TDD محاسبه شده است].";
             }
         } 
+        // محاسبات بر اساس گایدلاین‌ها و فرکانس تزریق
         else {
             let finalMultiplier = initialMultiplier;
-            let guideText = guide.toUpperCase();
 
-            if (guide === 'ada') {
-                if (insFrom === 'toujeo' && insTo === 'lantus') {
-                    finalMultiplier = 0.80; 
-                    explanation = "ضوابط اختصاصی بالینی ADA: در تبدیل توژئو به لانتوس به دلیل غلظت اثر متفاوت، کاهش حتمی ۲۰ درصدی دوز جهت جلوگیری از خطر افت شدید قند خون اعمال شد.";
-                } else if (insFrom === 'nph_basal' && ['lantus','toujeo','tresiba'].includes(insTo)) {
-                    finalMultiplier = 0.80;
-                    explanation = "ضوابط اختصاصی بالینی ADA: تغییر از انسولین سنتی NPH به آنالوگ‌های پیشرفته طولانی‌اثر، نیازمند کاهش ۲۰ درصدی در دوز پایه برای امنیت شبانه بیمار است.";
-                } else if (fromGroup === 'premix' || toGroup === 'premix') {
-                    finalMultiplier = 0.80;
-                    explanation = "توصیه عمومی ADA: در جابجایی بین انسولین‌های ترکیبی (Premix) و پایه، فرآیند ریاضی با اعمال احتیاط بیست درصدی دوز کل محاسبه می‌شود.";
-                } else {
-                    explanation = `محاسبه بر اساس استراتژی منتخب در شیوه‌نامه ADA با ضریب تبدیل ${finalMultiplier} اجرا شد.`;
-                }
-            } 
-            else if (guide === 'aace') {
-                if (fromGroup !== toGroup) {
-                    finalMultiplier = Math.min(finalMultiplier, 0.80); 
-                    explanation = "الگوریتم محافظه‌کارانه AACE: به دلیل تفاوت در ساختار کلاسی انسولین‌ها، شیوه‌نامه بالینی AACE اجازه تبدیل ۱:۱ را نداده و کاهش حداقل ۲۰ درصدی را جهت حفظ ایمنی بیمار قفل می‌کند.";
-                } else {
-                    finalMultiplier = Math.min(finalMultiplier, 0.85);
-                    explanation = "رویکرد کنترلی AACE: اعمال کاهش ۱۵ تا ۲۰ درصدی دوز به منظور پایش دقیق سوابق افت قند خون بیمار لحاظ گردید.";
-                }
-            } 
-            else if (guide === 'canadian') {
-                if (fromGroup === 'basal' && toGroup === 'basal' && insFrom !== 'toujeo') {
-                    finalMultiplier = 1.0; 
-                    explanation = "دستورالعمل دیابت کانادا (Diabetes Canada): این شیوه‌نامه تعویض آنالوگ‌های پایه هم‌سطح (مانند لانتوس و دگلودک) را به صورت مستقیم و واحد به واحد ($1:1$) مجاز می‌داند.";
-                } else if (insFrom === 'nph_basal') {
-                    finalMultiplier = 0.80;
-                    explanation = "معیار دیابت کانادا: انتقال دوز از انسولین ان‌پی‌اچ به آنالوگ‌های مدرن بر پایه کاهش ۲۰ درصدی فرمول پایه‌ریزی شده است.";
-                } else {
-                    explanation = `محاسبه بر اساس استراتژی منتخب در شیوه‌نامه دیابت کانادا با ضریب ${finalMultiplier} انجام گرفت.`;
-                }
-            } 
-            else if (guide === 'nice') {
-                if (fromGroup === 'premix' || insFrom === 'nph_basal') {
-                    finalMultiplier = 0.80;
-                    explanation = "راهنمای بالینی NICE انگلستان: انتقال از ساختارهای سنتی انسانی یا مخلوط به آنالوگ‌های خالص، شامل تعدیل ریاضی کاهش ۲۰ درصدی دوز پایه کل است.";
-                } else {
-                    explanation = `محاسبه بر اساس راهبرد منتخب در شیوه‌نامه NICE با ضریب ${finalMultiplier} صورت پذیرفت.`;
+            // بند حیاتی مدنظر شما: اگر تزریق مبدأ ۲ بار در روز باشد، کاهش ۲۰ درصدی به عنوان الزام گایدلاین اعمال می‌شود
+            if (isBIDFrom) {
+                finalMultiplier = 0.80;
+                explanation = "محاسبه بر اساس فرکانس BID: به دلیل تزریق ۲ بار در روز انسولین مبدأ، گایدلاین‌های بالینی (ADA/AACE) جهت کنترل ریسک هیپوگلیسمی، کاهش حتمی ۲۰ درصدی را روی مجموع TDD اعمال می‌کنند. ";
+            } else {
+                // محاسبات پیش‌فرض گایدلاین‌ها برای تزریق QD
+                if (guide === 'ada') {
+                    if (insFrom === 'toujeo' && insTo === 'lantus') {
+                        finalMultiplier = 0.80; 
+                        explanation = "ملاک اختصاصی ADA: در تبدیل توژئو به لانتوس به دلیل تفاوت فارماکوکینتیک، کاهش ۲۰٪ دوز جهت ایمنی الزامی است. ";
+                    } else if (insFrom === 'nph_basal' && ['lantus','toujeo','tresiba'].includes(insTo)) {
+                        finalMultiplier = 0.80;
+                        explanation = "ملاک اختصاصی ADA: تغییر از NPH یک‌بار در روز به آنالوگ‌های پیشرفته طولانی‌اثر، نیازمند کاهش دوز ۲۰٪ جهت پیشگیری از هیپوگلیسمی شبانه است. ";
+                    } else if (fromGroup === 'premix' || toGroup === 'premix') {
+                        finalMultiplier = 0.80;
+                        explanation = "توصیه عمومی ADA: در تعویض رژیم‌های مخلوط (Premix)، فرمول با اعمال ۲۰٪ کاهش احتیاطی محاسبه می‌شود. ";
+                    } else {
+                        explanation = `محاسبه بر اساس استراتژی منتخب در گایدلاین ADA با ضریب ${finalMultiplier} انجام شد. `;
+                    }
+                } 
+                else if (guide === 'aace') {
+                    if (fromGroup !== toGroup) {
+                        finalMultiplier = Math.min(finalMultiplier, 0.80); 
+                        explanation = "الگوریتم محافظه‌کارانه AACE: در سوییچ‌های بین‌کلاسی، گایدلاین AACE اجازه تبدیل ۱:۱ نداده و کاهش ۲۰ درصدی را قفل می‌کند. ";
+                    } else {
+                        finalMultiplier = Math.min(finalMultiplier, 0.85);
+                        explanation = "رویکرد کنترلی AACE: اعمال کاهش دوز ۱۵ تا ۲۰ درصدی برای پیشگیری ایمن از افت قند خون لحاظ گردید. ";
+                    }
+                } 
+                else if (guide === 'canadian') {
+                    if (fromGroup === 'basal' && toGroup === 'basal' && insFrom !== 'toujeo') {
+                        finalMultiplier = 1.0; 
+                        explanation = "دستورالعمل Diabetes Canada: این گایدلاین تعویض آنالوگ‌های پایه هم‌سطح (مانند لانتوس و دگلودک) را به صورت مستقیم و واحد به واحد (۱:۱) مجاز می‌داند. ";
+                    } else if (insFrom === 'nph_basal') {
+                        finalMultiplier = 0.80;
+                        explanation = "معیار Diabetes Canada: انتقال دوز از NPH به آنالوگ‌های مدرن شامل کاهش ساختاری ۲۰ درصدی دوز کل است. ";
+                    } else {
+                        explanation = `محاسبه بر اساس استراتژی منتخب در گایدلاین Diabetes Canada با ضریب ${finalMultiplier} انجام شد. `;
+                    }
+                } 
+                else if (guide === 'nice') {
+                    if (fromGroup === 'premix' || insFrom === 'nph_basal') {
+                        finalMultiplier = 0.80;
+                        explanation = "راهنمای کلینیکال NICE: انتقال از ساختارهای سنتی یا مخلوط به آنالوگ‌های خالص، شامل کاهش ۲۰ درصدی دوز پایه کل است. ";
+                    } else {
+                        explanation = `محاسبه بر اساس استراتژی منتخب در گایدلاین NICE با ضریب ${finalMultiplier} انجام شد. `;
+                    }
                 }
             }
 
             newDose = Math.round(dose * finalMultiplier);
+            
+            // نمایش نحوه تقسیم دوز اگر مقصد BID باشد
+            if (isBIDTo) {
+                let amDose = Math.round(newDose * 0.5);
+                let pmDose = newDose - amDose;
+                explanation += `\n[توزیع دوز مقصد BID]: پیشنهاد می‌شود دوز کل به صورت ۵۰:۵۰ تقسیم گردد (${amDose} واحد صبح / ${pmDose} واحد شب) یا طبق متد بالینی ۲/۳ صبح و ۱/۳ شب تجویز شود.`;
+            }
         }
 
         document.getElementById('resultText').innerText = `${newDose} واحد`;
@@ -384,7 +471,7 @@
     }
 
     window.onload = function() {
-        updateGuidelines();
+        updateRegimen();
     };
 </script>
 </body>
