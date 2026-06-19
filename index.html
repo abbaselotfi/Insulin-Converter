@@ -6,7 +6,7 @@
     <title>سامانه پیشرفته تبدیل و محاسبه دوز انسولین</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0056b3">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <link class="apple-touch-icon" href="icon-192.png">
     <style>
         body {
             font-family: 'Tahoma', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -118,20 +118,12 @@
             border-left: 4px solid #f5c6cb;
             display: none;
         }
-        .freq-badge {
-            background-color: #fff3cd;
-            color: #856404;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            margin-top: 5px;
-            border: 1px solid #ffeeba;
-        }
     </style>
-</div>
+</head>
+<body>
 
 <div class="container">
-    <a href="./soliqua.html" class="soliqua-nav-btn">📘 راهنمای بالینی و ویژگی‌های قلم انسولین سولیکوآ Soliqua</a>
+    <a href="./soliqua.html" class="soliqua-nav-btn">📘 راهنمای بالینی و ویژگی‌های هر دو قلم Soliqua</a>
 
     <h2>سامانه کلینیکال تبدیل انسولین</h2>
     
@@ -220,7 +212,7 @@
         <label for="strategy">استراتژی بالینی کاهش دوز:</label>
         <select id="strategy">
             <option value="0.8">کاهش ۲۰ درصدی دوز</option>
-            <option value="1.0">تبدیل واحد به واحد ۱:۱</option>
+            <option value="1.0">پایش مستقیم بالینی دوز معادل</option>
             <option value="0.85">کاهش ۱۵ درصدی دوز</option>
         </select>
     </div>
@@ -246,7 +238,6 @@
         let valFrom = insFromSelect.value;
         let valTo = insToSelect.value;
 
-        // ممانعت از تبدیل هم‌نام (اگر برابر باشند، گزینه بعدی انتخاب می‌شود)
         if (valFrom === valTo) {
             for (let opt of insToSelect.options) {
                 if (opt.value !== valFrom) {
@@ -257,7 +248,6 @@
             }
         }
 
-        // فیلترینگ متقابل گزینه‌ها در دو کرکره
         for (let opt of insToSelect.options) {
             opt.disabled = (opt.value === valFrom);
             opt.style.display = (opt.value === valFrom) ? 'none' : 'block';
@@ -267,7 +257,6 @@
             opt.style.display = (opt.value === valTo) ? 'none' : 'block';
         }
 
-        // مدیریت پویای منوی گایدلاین‌ها
         const guidelineSelect = document.getElementById('guideline');
         const previousSelection = guidelineSelect.value;
         guidelineSelect.innerHTML = '';
@@ -289,7 +278,6 @@
             }
         }
 
-        // مدیریت فیلد تعداد تزریق (ممنوعیت برای توژئو، دگلودک و سولیکوآ)
         const strictlyOnceDaily = ['toujeo', 'tresiba', 'soliqua_50', 'soliqua_33'];
         
         const freqFromBox = document.getElementById('freqFromBox');
@@ -308,7 +296,6 @@
             document.getElementById('freqTo').value = '1';
         }
 
-        // مخفی‌سازی استراتژی دستی در صورت انتخاب سولیکوآ به عنوان مقصد
         const strategyBox = document.getElementById('strategyBox');
         if (valTo.includes('soliqua')) {
             strategyBox.style.display = 'none';
@@ -318,6 +305,7 @@
         }
     }
 
+    // اعمال اصلاحیه نگارشی و پویای شما برای گزینه دوز معادل
     function updateStrategies() {
         const guide = document.getElementById('guideline').value;
         const strategySelect = document.getElementById('strategy');
@@ -331,7 +319,7 @@
         if (guide === 'sanofi') guideName = 'Sanofi';
 
         strategySelect.options[0].text = `کاهش ۲۰ درصدی دوز (رویکرد محافظه‌کارانه بر اساس گایدلاین ${guideName})`;
-        strategySelect.options[1].text = `تبدیل واحد به واحد ۱:۱ (تحت پایش مستقیم بر اساس گایدلاین ${guideName})`;
+        strategySelect.options[1].text = `پایش مستقیم بالینی و تجویز دوز معادل بر اساس گایدلاین ${guideName}`;
         strategySelect.options[2].text = `کاهش ۱۵ درصدی دوز (تعدیل استاندارد بالینی بر اساس گایدلاین ${guideName})`;
     }
 
@@ -364,11 +352,10 @@
         const fromGroup = getGroupType(insFrom);
         const toGroup = getGroupType(insTo);
 
-        // پروتکل اختصاصی سولیکوآ (مقصد)
         if (insTo === 'soliqua_50') {
             if (dose >= 20 && dose <= 30) {
                 newDose = dose;
-                explanation = "سوییچ به سولیکوآ ۱۰۰/۵۰ (قلم زرد). طبق پروتکل رسمی Sanofi/EMA، برای TDD انسولین پایه بین ۲۰ تا ۳۰ واحد، شروع درمان به صورت ۱:۱ انجام می‌شود.";
+                explanation = "سوییچ به سولیکوآ ۱۰۰/۵۰ (قلم زرد). طبق پروتکل رسمی Sanofi/EMA، برای TDD انسولین پایه بین ۲۰ تا ۳۰ واحد، شروع درمان بر مبنای دوز معادل انجام می‌شود.";
             } else if (dose < 20) {
                 newDose = 10;
                 explanation = "به دلیل دوز پایه پایین قبلی (کمتر از ۲۰ واحد)، دوز شروع ایمن از کف دوز قلم زرد یعنی ۱۰ واحد تعیین گردید.";
@@ -400,16 +387,13 @@
                 explanation += " [توجه: دوز بر اساس مجموع TDD محاسبه شده است].";
             }
         } 
-        // محاسبات بر اساس گایدلاین‌ها و فرکانس تزریق
         else {
             let finalMultiplier = initialMultiplier;
 
-            // بند حیاتی مدنظر شما: اگر تزریق مبدأ ۲ بار در روز باشد، کاهش ۲۰ درصدی به عنوان الزام گایدلاین اعمال می‌شود
             if (isBIDFrom) {
                 finalMultiplier = 0.80;
                 explanation = "محاسبه بر اساس فرکانس BID: به دلیل تزریق ۲ بار در روز انسولین مبدأ، گایدلاین‌های بالینی (ADA/AACE) جهت کنترل ریسک هیپوگلیسمی، کاهش حتمی ۲۰ درصدی را روی مجموع TDD اعمال می‌کنند. ";
             } else {
-                // محاسبات پیش‌فرض گایدلاین‌ها برای تزریق QD
                 if (guide === 'ada') {
                     if (insFrom === 'toujeo' && insTo === 'lantus') {
                         finalMultiplier = 0.80; 
@@ -427,7 +411,7 @@
                 else if (guide === 'aace') {
                     if (fromGroup !== toGroup) {
                         finalMultiplier = Math.min(finalMultiplier, 0.80); 
-                        explanation = "الگوریتم محافظه‌کارانه AACE: در سوییچ‌های بین‌کلاسی، گایدلاین AACE اجازه تبدیل ۱:۱ نداده و کاهش ۲۰ درصدی را قفل می‌کند. ";
+                        explanation = "الگوریتم محافظه‌کارانه AACE: در سوییچ‌های بین‌کلاسی، گایدلاین AACE اجازه تبدیل بدون کاهش دوز نداده و کاهش ۲۰ درصدی را قفل می‌کند. ";
                     } else {
                         finalMultiplier = Math.min(finalMultiplier, 0.85);
                         explanation = "رویکرد کنترلی AACE: اعمال کاهش دوز ۱۵ تا ۲۰ درصدی برای پیشگیری ایمن از افت قند خون لحاظ گردید. ";
@@ -436,7 +420,7 @@
                 else if (guide === 'canadian') {
                     if (fromGroup === 'basal' && toGroup === 'basal' && insFrom !== 'toujeo') {
                         finalMultiplier = 1.0; 
-                        explanation = "دستورالعمل Diabetes Canada: این گایدلاین تعویض آنالوگ‌های پایه هم‌سطح (مانند لانتوس و دگلودک) را به صورت مستقیم و واحد به واحد (۱:۱) مجاز می‌داند. ";
+                        explanation = "دستورالعمل Diabetes Canada: این گایدلاین تعویض آنالوگ‌های پایه هم‌سط (مانند لانتوس و دگلودک) را به صورت مستقیم و با پایش بالینی مجاز می‌داند. ";
                     } else if (insFrom === 'nph_basal') {
                         finalMultiplier = 0.80;
                         explanation = "معیار Diabetes Canada: انتقال دوز از NPH به آنالوگ‌های مدرن شامل کاهش ساختاری ۲۰ درصدی دوز کل است. ";
@@ -456,7 +440,6 @@
 
             newDose = Math.round(dose * finalMultiplier);
             
-            // نمایش نحوه تقسیم دوز اگر مقصد BID باشد
             if (isBIDTo) {
                 let amDose = Math.round(newDose * 0.5);
                 let pmDose = newDose - amDose;
