@@ -224,7 +224,7 @@
 
     <div class="result-box" id="resultBox">
         <div class="result-title">💡 دوز پیشنهادی جدید:</div>
-        <div id="resultText" style="font-size: 20px; font-weight: bold; color: #004085; line-height: 1.5;"></div>
+        <div id="resultText" style="font-size: 20px; line-height: 1.5;"></div>
         <div id="descText" style="margin-top: 10px; font-size: 14px; line-height: 1.4;"></div>
     </div>
 
@@ -259,7 +259,7 @@
                 let isCompatible = true;
 
                 if (valFrom === opt.value) isCompatible = false;
-                if (fromGroup === 'soliqua' && optGroup === 'soliqua') isCompatible = false; // عدم تکرار یا تبدیل سولیکوآ به سولیکوآ
+                if (fromGroup === 'soliqua' && optGroup === 'soliqua') isCompatible = false; 
                 if (fromGroup === 'bolus' && optGroup !== 'bolus') isCompatible = false;
                 if (fromGroup !== 'bolus' && optGroup === 'bolus') isCompatible = false;
 
@@ -291,7 +291,6 @@
         let valTo = insToSelect.value;
         let toGroup = getGroupType(valTo);
 
-        // بروزرسانی داینامیک منوی گایدلاین‌ها
         const guidelineSelect = document.getElementById('guideline');
         const previousSelection = guidelineSelect.value;
         guidelineSelect.innerHTML = '';
@@ -315,13 +314,11 @@
 
         const strictlyOnceDaily = ['toujeo', 'tresiba', 'soliqua_50', 'soliqua_33', 'soliqua_combined'];
         
-        // مدیریت کرکره فرکانس مبدأ
         const freqFromBox = document.getElementById('freqFromBox');
         const freqFromSelect = document.getElementById('freqFrom');
         if (!strictlyOnceDaily.includes(valFrom) && fromGroup !== 'bolus') {
             freqFromBox.style.display = 'block';
             
-            // مدیریت گزینه TID (۳ بار در روز) برای مبدأ
             if (fromGroup === 'premix' && valFrom !== 'ryzodeg') {
                 if (freqFromSelect.options.length < 3) {
                     let opt = document.createElement('option');
@@ -340,13 +337,11 @@
             freqFromSelect.value = '1';
         }
 
-        // مدیریت کرکره فرکانس مقصد
         const freqToBox = document.getElementById('freqToBox');
         const freqToSelect = document.getElementById('freqTo');
         if (!strictlyOnceDaily.includes(valTo) && toGroup !== 'bolus') {
             freqToBox.style.display = 'block';
             
-            // مدیریت گزینه TID (۳ بار در روز) برای مقصد
             if (toGroup === 'premix' && valTo !== 'ryzodeg') {
                 if (freqToSelect.options.length < 3) {
                     let opt = document.createElement('option');
@@ -437,14 +432,15 @@
         let explanation = "";
         let fromGroup = getGroupType(insFrom);
         let toGroup = getGroupType(insTo);
-        let targetInsulinName = ""; // برای تفکیک نام سولیکوآ در پنجره خروجی
+        let targetInsulinName = ""; 
+        let targetColor = "#333"; // رنگ پیش‌فرض نام انسولین
 
         // لایه اول: استخراج دوز مؤثر (جداسازی بخش بیزال در صورت نیاز)
         let effectiveDose = dose;
         let premixSplitNotice = "";
         
         if (fromGroup === 'premix' && (toGroup === 'basal' || toGroup === 'soliqua')) {
-            let premixFactor = 0.70; // پیش‌فرض برای نوومیکس، رایزودگ و میکس انسانی
+            let premixFactor = 0.70; 
             let brandName = "نوومیکس/میکس انسانی/رایزودگ (نسبت ۷۰٪ بیزال)";
             
             if (insFrom === 'humalog_mix_25') {
@@ -466,23 +462,35 @@
             newDose = Math.round(dose);
             explanation = "تبدیل انسولین‌های سریع‌الاثر/بولوس: طبق راهنماهای بالینی، تعویض بین آنالوگ‌های سریع هم‌گروه (مانند نوورپید به آپیدرا) کاملاً به صورت مستقیم و واحدبه-واحد (1:1) انجام می‌شود.";
         }
-        // ۲. سوییچ هوشمند و تفکیک‌شده به سولیکوآ بر اساس مرز دوز ۳۰ واحد
+        // ۲. سوییچ هوشمند به سولیکوآ با لحاظ کردن قانون اختصاصی توژئو (کاهش ۲۰ درصدی ساختاری)
         else if (insTo === 'soliqua_combined') {
-            if (effectiveDose > 30) {
+            let soliquaEffectiveDose = effectiveDose;
+            let toujeoNotice = "";
+
+            // اعمال ضریب کاهشی ۲۰٪ گایدلاین در صورت تغییر از توژئو به سولیکوآ
+            if (insFrom === 'toujeo') {
+                soliquaEffectiveDose = effectiveDose * 0.80;
+                toujeoNotice = "با توجه به سوییچ از انسولین توژئو (Glargine U-300)، طبق دستورالعمل رسمی سازنده سولیکوآ، کاهش ساختاری ۲۰٪ جهت ایمنی بالینی و جبران غلظت تزریق اعمال شد. ";
+            }
+
+            if (soliquaEffectiveDose > 30) {
                 newDose = 30;
                 targetInsulinName = "Insulin FRC Soliqua 100/33";
-                explanation = premixSplitNotice + "سوییچ به سولیکوآ. با توجه به اینکه دوز انسولین پایه محاسباتی بالاتر از ۳۰ واحد است، قلم Insulin FRC Soliqua 100/33 تعیین شد و طبق پروتکل دوز شروع استاندارد آن ۳۰ واحد می‌باشد.";
-            } else if (effectiveDose >= 20 && effectiveDose <= 30) {
-                newDose = Math.round(effectiveDose);
+                targetColor = "#446600"; // رنگ زیتونی (تیره و خوانا روی پس‌زمینه آبی روشن)
+                explanation = premixSplitNotice + toujeoNotice + "با توجه به اینکه دوز انسولین پایه نهایی بالاتر از ۳۰ واحد است، قلم Insulin FRC Soliqua 100/33 تعیین شد و طبق پروتکل دوز شروع استاندارد آن ۳۰ واحد می‌باشد.";
+            } else if (soliquaEffectiveDose >= 20 && soliquaEffectiveDose <= 30) {
+                newDose = Math.round(soliquaEffectiveDose);
                 targetInsulinName = "Insulin FRC Soliqua 100/50";
-                explanation = premixSplitNotice + "سوییچ به سولیکوآ. طبق پروتکل رسمی Sanofi/EMA، برای دوز انسولین پایه بین ۲۰ تا ۳۰ واحد، قلم Insulin FRC Soliqua 100/50 انتخاب شده و شروع درمان بر مبنای دوز معادل انجام می‌شود.";
+                targetColor = "#d66800"; // رنگ زرد/هلویی (تیره شده برای خوانایی بالا)
+                explanation = premixSplitNotice + toujeoNotice + "طبق پروتکل رسمی Sanofi/EMA، برای دوز انسولین پایه بین ۲۰ تا ۳۰ واحد، قلم Insulin FRC Soliqua 100/50 انتخاب شده و درمان بر مبنای دوز معادل آغاز می‌شود.";
             } else {
                 newDose = 10;
                 targetInsulinName = "Insulin FRC Soliqua 100/50";
-                explanation = premixSplitNotice + "سوییچ به سولیکوآ. به دلیل دوز پایه پایین قبلی (کمتر از ۲۰ واحد)، قلم Insulin FRC Soliqua 100/50 انتخاب شده و دوز شروع ایمن از کف دوز قلم یعنی ۱۰ واحد تعیین گردید.";
+                targetColor = "#d66800"; // رنگ زرد/هلویی
+                explanation = premixSplitNotice + toujeoNotice + "به دلیل دوز پایه پایین قبلی (کمتر از ۲۰ واحد)، قلم Insulin FRC Soliqua 100/50 انتخاب شده و دوز شروع ایمن از کف دوز قلم یعنی ۱۰ واحد تعیین گردید.";
             }
         } 
-        // ۳. سناریوی معکوس: تبدیل بیزال به میکس (اضافه شدن بخش پراندیال)
+        // ۳. سناریوی معکوس: تبدیل بیزال به میکس
         else if (fromGroup === 'basal' && toGroup === 'premix') {
             let finalMultiplier = initialMultiplier;
             let safetyWarning = "";
@@ -495,10 +503,9 @@
             newDose = Math.round(dose * finalMultiplier);
             explanation = safetyWarning + `سوییچ از انسولین پایه به انسولین میکس با ضریب ${finalMultiplier} انجام شد. دوز کل جدید روزانه ${newDose} واحد می‌باشد. `;
 
-            // توزیع دوز بر اساس فرکانس مقصد
             if (isBIDTo) {
-                let amDose = Math.round(newDose * 0.66); // نسبت ۲/۳ صبح
-                let pmDose = newDose - amDose;          // نسبت ۱/۳ شب
+                let amDose = Math.round(newDose * 0.66); 
+                let pmDose = newDose - amDose;          
                 explanation += `\n\n[توزیع دوز مقصد BID]: پیشنهاد می‌شود دوز کل به صورت ۲/۳ قبل از صبحانه (${amDose} واحد) و ۱/۳ قبل از شام (${pmDose} واحد) تزریق گردد.`;
             } else if (isTIDTo) {
                 let amDose = Math.round(newDose * 0.40);
@@ -556,10 +563,9 @@
                 }
             }
 
-            // لایه سوم: اثر فرکانس‌های چندتزریقی مبدأ (TID و BID)
             if (isTIDFrom) {
                 finalMultiplier = Math.min(finalMultiplier, 0.80);
-                explanation = premixSplitNotice + "تعدیل رژیم پیچیده (TID Premix به Basal QD): با توجه به فرکانس ۳ بار در روز انسولین میکس، سهم پایه استخراج و به دلیل حذف کامل دوزهای سریع‌الاثر، کاهش دوز ۲۰ درصدی جهت پیشگیری از تجمع دوز اعمال شد. پایش قندهای بعد از غذا ضروری است. " + baseExplanation;
+                explanation = premixSplitNotice + "تعدیل رژیم پیچیده (TID Premix به Basal QD): با توجه به فرکانس ۳ بار در روز انسولین میکس، سهم پایه استخراج و به دلیل حذف کامل دوزهای سریع‌الاثر، کاهش دوز ۲۰ درصدی جهت پیشگیری از تجمع دوز اعمال شد. " + baseExplanation;
             } else if (isBIDFrom) {
                 finalMultiplier = Math.min(finalMultiplier, 0.80);
                 explanation = premixSplitNotice + "تعدیل فرکانس (BID به QD): به دلیل فرکانس ۲ بار در روز انسولین مبدأ, جهت جلوگیری از تجمع دوز در یک نوبت، کاهش دوز ۲۰ درصدی بر محاسبات اعمال شد. " + baseExplanation;
@@ -575,7 +581,6 @@
 
             newDose = Math.round(effectiveDose * finalMultiplier);
             
-            // پیاده‌سازی توزیع دوز مقصد چندتزریقی برای حالت‌های معمولی
             if (isBIDTo && !isBIDFrom) {
                 let amDose = Math.round(newDose * 0.5);
                 let pmDose = newDose - amDose;
@@ -583,14 +588,14 @@
             }
         }
 
-        // لایه نهایی نمایش نتایج بر اساس نوع انسولین مقصد
+        // رندر ساختار جدید و رنگ آمیزی اختصاصی متون برای زیبایی بیشتر
         if (insTo === 'soliqua_combined') {
             document.getElementById('resultText').innerHTML = `
-                <div style="font-size: 15px; color: #555; font-weight: normal; margin-bottom: 4px;">${targetInsulinName}</div>
-                <div>${newDose} واحد</div>
+                <div style="font-size: 15px; color: ${targetColor}; font-weight: bold; margin-bottom: 4px;">${targetInsulinName}</div>
+                <div style="font-size: 24px; font-weight: bold; color: #004085;">${newDose} واحد</div>
             `;
         } else {
-            document.getElementById('resultText').innerText = `${newDose} واحد`;
+            document.getElementById('resultText').innerHTML = `<div style="font-size: 24px; font-weight: bold; color: #004085;">${newDose} واحد</div>`;
         }
 
         document.getElementById('descText').innerText = explanation;
