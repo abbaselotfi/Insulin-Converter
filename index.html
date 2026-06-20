@@ -123,7 +123,7 @@
 <body>
 
 <div class="container">
-    <a href="./soliqua.html" class="soliqua-nav-btn">📘 راهنمای بالینی و ویژگی‌های هر دو قلم Soliqua</a>
+    <a href="./soliqua.html" class="soliqua-nav-btn">📘 راهنمای بالینی و ویژگی‌های قلم انسولین سولیکوآ Soliqua</a>
 
     <h2>سامانه کلینیکال تبدیل انسولین</h2>
     
@@ -433,7 +433,7 @@
         let fromGroup = getGroupType(insFrom);
         let toGroup = getGroupType(insTo);
         let targetInsulinName = ""; 
-        let targetColor = "#333"; // رنگ پیش‌فرض نام انسولین
+        let targetColor = "#333"; 
 
         // لایه اول: استخراج دوز مؤثر (جداسازی بخش بیزال در صورت نیاز)
         let effectiveDose = dose;
@@ -462,7 +462,7 @@
             newDose = Math.round(dose);
             explanation = "تبدیل انسولین‌های سریع‌الاثر/بولوس: طبق راهنماهای بالینی، تعویض بین آنالوگ‌های سریع هم‌گروه (مانند نوورپید به آپیدرا) کاملاً به صورت مستقیم و واحدبه-واحد (1:1) انجام می‌شود.";
         }
-        // ۲. سوییچ هوشمند به سولیکوآ با لحاظ کردن قانون اختصاصی توژئو (کاهش ۲۰ درصدی ساختاری)
+        // ۲. سوییچ هوشمند به سولیکوآ با اصلاح مرزهای دوز (Boundary Bug Fixed)
         else if (insTo === 'soliqua_combined') {
             let soliquaEffectiveDose = effectiveDose;
             let toujeoNotice = "";
@@ -473,21 +473,22 @@
                 toujeoNotice = "با توجه به سوییچ از انسولین توژئو (Glargine U-300)، طبق دستورالعمل رسمی سازنده سولیکوآ، کاهش ساختاری ۲۰٪ جهت ایمنی بالینی و جبران غلظت تزریق اعمال شد. ";
             }
 
-            if (soliquaEffectiveDose > 30) {
-                newDose = 30;
+            // پیاده‌سازی اصلاح‌شده بازه‌های تیتراسیون و تحمل گوارشی بر اساس گایدلاین رسمی
+            if (soliquaEffectiveDose >= 30) {
+                newDose = 30; // قفل شدن دوز روی کف قلم 100/33 برای بازه 30 تا 60 واحد
                 targetInsulinName = "Insulin FRC Soliqua 100/33";
-                targetColor = "#446600"; // رنگ زیتونی (تیره و خوانا روی پس‌زمینه آبی روشن)
-                explanation = premixSplitNotice + toujeoNotice + "با توجه به اینکه دوز انسولین پایه نهایی بالاتر از ۳۰ واحد است، قلم Insulin FRC Soliqua 100/33 تعیین شد و طبق پروتکل دوز شروع استاندارد آن ۳۰ واحد می‌باشد.";
-            } else if (soliquaEffectiveDose >= 20 && soliquaEffectiveDose <= 30) {
-                newDose = Math.round(soliquaEffectiveDose);
-                targetInsulinName = "Insulin FRC Soliqua 100/50";
-                targetColor = "#d66800"; // رنگ زرد/هلویی (تیره شده برای خوانایی بالا)
-                explanation = premixSplitNotice + toujeoNotice + "طبق پروتکل رسمی Sanofi/EMA، برای دوز انسولین پایه بین ۲۰ تا ۳۰ واحد، قلم Insulin FRC Soliqua 100/50 انتخاب شده و درمان بر مبنای دوز معادل آغاز می‌شود.";
-            } else {
-                newDose = 10;
+                targetColor = "#446600"; // رنگ زیتونی
+                explanation = premixSplitNotice + toujeoNotice + "سوییچ به سولیکوآ: دوز انسولین پایه محاسباتی شما ۳۰ واحد یا بالاتر (در بازه ۳۰ تا ۶۰ واحد) است؛ بنابراین قلم Insulin FRC Soliqua 100/33 تعیین شد. جهت پیشگیری از عوارض گوارشی شدید (تهوع/استفراغ حاد) ناشی از جزء لایکسیزناتاید، دوز شروع درمان طبق گایدلاین باید دقیقاً روی دوز پایه‌ی ۳۰ واحد قفل (Cap) شده و سپس تیتراسیون هفتگی انجام شود.";
+            } else if (soliquaEffectiveDose >= 20 && soliquaEffectiveDose < 30) {
+                newDose = 20; // قفل شدن روی دوز ایمن قلم 100/50 برای بازه 20 تا 29 واحد
                 targetInsulinName = "Insulin FRC Soliqua 100/50";
                 targetColor = "#d66800"; // رنگ زرد/هلویی
-                explanation = premixSplitNotice + toujeoNotice + "به دلیل دوز پایه پایین قبلی (کمتر از ۲۰ واحد)، قلم Insulin FRC Soliqua 100/50 انتخاب شده و دوز شروع ایمن از کف دوز قلم یعنی ۱۰ واحد تعیین گردید.";
+                explanation = premixSplitNotice + toujeoNotice + "سوییچ به سولیکوآ: دوز انسولین پایه محاسباتی شما بین ۲۰ تا ۲۹ واحد است؛ بنابراین قلم Insulin FRC Soliqua 100/50 تعیین شد. طبق پروتکل رسمی سازنده، برای غلبه بر عوارض ناخواسته گوارشی داروی ترکیبی، دوز شروع درمان دقیقاً روی دوز ایمن ۲۰ واحد فیکس شده و افزایش دوز بر اساس تیتراسیون صورت می‌گیرد.";
+            } else {
+                newDose = 10; // کف دوز شروع قلم 100/50 برای دوزهای زیر 20 واحد
+                targetInsulinName = "Insulin FRC Soliqua 100/50";
+                targetColor = "#d66800"; // رنگ زرد/هلویی
+                explanation = premixSplitNotice + toujeoNotice + "سوییچ به سولیکوآ: به دلیل دوز پایه پایین قبلی (کمتر از ۲۰ واحد)، قلم Insulin FRC Soliqua 100/50 انتخاب شده و دوز شروع ایمن از کف دوز رسمی قلم یعنی ۱۰ واحد تعیین گردید.";
             }
         } 
         // ۳. سناریوی معکوس: تبدیل بیزال به میکس
@@ -588,10 +589,10 @@
             }
         }
 
-        // رندر ساختار جدید و رنگ آمیزی اختصاصی متون برای زیبایی بیشتر
+        // رندر نهایی و دقیق خروجی
         if (insTo === 'soliqua_combined') {
             document.getElementById('resultText').innerHTML = `
-                <div style="font-size: 15px; color: ${targetColor}; font-weight: bold; margin-bottom: 4px;">${targetInsulinName}</div>
+                <div style="font-size: 16px; color: ${targetColor}; font-weight: bold; margin-bottom: 4px;">${targetInsulinName}</div>
                 <div style="font-size: 24px; font-weight: bold; color: #004085;">${newDose} واحد</div>
             `;
         } else {
