@@ -123,7 +123,7 @@
 <body>
 
 <div class="container">
-    <a href="./soliqua.html" class="soliqua-nav-btn">📘 راهنمای بالینی و ویژگی‌های انسولین سولیکوآ Soliqua</a>
+    <a href="./soliqua.html" class="soliqua-nav-btn">📘 راهنمای بالینی و ویژگی‌های هر دو قلم Soliqua</a>
 
     <h2>سامانه کلینیکال تبدیل انسولین</h2>
     
@@ -168,8 +168,7 @@
         <label for="insTo">انسولین جایگزین (مقصد):</label>
         <select id="insTo" onchange="updateRegimen()">
             <optgroup label="انسولین‌های ترکیبی مدرن (FRC)">
-                <option value="soliqua_50">سولیکوآ ۱۰۰/۵۰ (قلم زرد/هلویی)</option>
-                <option value="soliqua_33">سولیکوآ ۱۰۰/۳۳ (قلم زیتونی)</option>
+                <option value="soliqua_combined">Soliqua 100/50 یا Soliqua 100/33</option>
             </optgroup>
             <optgroup label="انسولین‌های پایه (Basal)">
                 <option value="lantus">لانتوس (Glargine U-100)</option>
@@ -225,7 +224,7 @@
 
     <div class="result-box" id="resultBox">
         <div class="result-title">💡 دوز پیشنهادی جدید:</div>
-        <div id="resultText" style="font-size: 22px; font-weight: bold; color: #004085;"></div>
+        <div id="resultText" style="font-size: 20px; font-weight: bold; color: #004085; line-height: 1.5;"></div>
         <div id="descText" style="margin-top: 10px; font-size: 14px; line-height: 1.4;"></div>
     </div>
 
@@ -238,7 +237,7 @@
     function getGroupType(val) {
         if(['lantus','toujeo','tresiba','levemir','nph_basal'].includes(val)) return 'basal';
         if(['novomix','humalog_mix_25','humalog_mix_50','ryzodeg','human_mix'].includes(val)) return 'premix';
-        if(val === 'soliqua_50' || val === 'soliqua_33') return 'soliqua';
+        if(val === 'soliqua_50' || val === 'soliqua_33' || val === 'soliqua_combined') return 'soliqua';
         if(val === 'apidra_novorapid' || val === 'regular') return 'bolus';
         return 'basal';
     }
@@ -260,6 +259,7 @@
                 let isCompatible = true;
 
                 if (valFrom === opt.value) isCompatible = false;
+                if (fromGroup === 'soliqua' && optGroup === 'soliqua') isCompatible = false; // عدم تکرار یا تبدیل سولیکوآ به سولیکوآ
                 if (fromGroup === 'bolus' && optGroup !== 'bolus') isCompatible = false;
                 if (fromGroup !== 'bolus' && optGroup === 'bolus') isCompatible = false;
 
@@ -313,7 +313,7 @@
             }
         }
 
-        const strictlyOnceDaily = ['toujeo', 'tresiba', 'soliqua_50', 'soliqua_33'];
+        const strictlyOnceDaily = ['toujeo', 'tresiba', 'soliqua_50', 'soliqua_33', 'soliqua_combined'];
         
         // مدیریت کرکره فرکانس مبدأ
         const freqFromBox = document.getElementById('freqFromBox');
@@ -437,6 +437,7 @@
         let explanation = "";
         let fromGroup = getGroupType(insFrom);
         let toGroup = getGroupType(insTo);
+        let targetInsulinName = ""; // برای تفکیک نام سولیکوآ در پنجره خروجی
 
         // لایه اول: استخراج دوز مؤثر (جداسازی بخش بیزال در صورت نیاز)
         let effectiveDose = dose;
@@ -465,33 +466,23 @@
             newDose = Math.round(dose);
             explanation = "تبدیل انسولین‌های سریع‌الاثر/بولوس: طبق راهنماهای بالینی، تعویض بین آنالوگ‌های سریع هم‌گروه (مانند نوورپید به آپیدرا) کاملاً به صورت مستقیم و واحدبه-واحد (1:1) انجام می‌شود.";
         }
-        // ۲. سوییچ به سولیکوآ ۱۰۰/۵۰ (قلم زرد)
-        else if (insTo === 'soliqua_50') {
-            if (effectiveDose >= 20 && effectiveDose <= 30) {
+        // ۲. سوییچ هوشمند و تفکیک‌شده به سولیکوآ بر اساس مرز دوز ۳۰ واحد
+        else if (insTo === 'soliqua_combined') {
+            if (effectiveDose > 30) {
+                newDose = 30;
+                targetInsulinName = "Insulin FRC Soliqua 100/33";
+                explanation = premixSplitNotice + "سوییچ به سولیکوآ. با توجه به اینکه دوز انسولین پایه محاسباتی بالاتر از ۳۰ واحد است، قلم Insulin FRC Soliqua 100/33 تعیین شد و طبق پروتکل دوز شروع استاندارد آن ۳۰ واحد می‌باشد.";
+            } else if (effectiveDose >= 20 && effectiveDose <= 30) {
                 newDose = Math.round(effectiveDose);
-                explanation = premixSplitNotice + "سوییچ به سولیکوآ ۱۰۰/۵۰ (قلم زرد). طبق پروتکل رسمی Sanofi/EMA، برای دوز انسولین پایه بین ۲۰ تا ۳۰ واحد، شروع درمان بر مبنای دوز معادل انجام می‌شود.";
-            } else if (effectiveDose < 20) {
+                targetInsulinName = "Insulin FRC Soliqua 100/50";
+                explanation = premixSplitNotice + "سوییچ به سولیکوآ. طبق پروتکل رسمی Sanofi/EMA، برای دوز انسولین پایه بین ۲۰ تا ۳۰ واحد، قلم Insulin FRC Soliqua 100/50 انتخاب شده و شروع درمان بر مبنای دوز معادل انجام می‌شود.";
+            } else {
                 newDose = 10;
-                explanation = premixSplitNotice + "به دلیل دوز پایه پایین قبلی (کمتر از ۲۰ واحد)، دوز شروع ایمن از کف دوز قلم زرد یعنی ۱۰ واحد تعیین گردید.";
-            } else {
-                newDose = 30;
-                explanation = premixSplitNotice + "دوز انسولین پایه محاسباتی بالاتر از سقف شروع قلم زرد است؛ ارزیابی سوییچ مستقیم به قلم ۱۰۰/۳۳ (زیتونی) توصیه می‌شود.";
+                targetInsulinName = "Insulin FRC Soliqua 100/50";
+                explanation = premixSplitNotice + "سوییچ به سولیکوآ. به دلیل دوز پایه پایین قبلی (کمتر از ۲۰ واحد)، قلم Insulin FRC Soliqua 100/50 انتخاب شده و دوز شروع ایمن از کف دوز قلم یعنی ۱۰ واحد تعیین گردید.";
             }
         } 
-        // ۳. سوییچ به سولیکوآ ۱۰۰/۳۳ (قلم زیتونی)
-        else if (insTo === 'soliqua_33') {
-            if (insFrom === 'soliqua_50') {
-                newDose = (dose >= 40) ? 40 : Math.round(dose);
-                explanation = (dose >= 40) ? "طبق گایدلاین رسمی، سقف تیتراسیون قلم زرد ۴۰ واحد است. برای دوزهای بالاتر، بیمار باید با دوز ۴۰ واحد روی قلم زیتونی سوییچ شود." : "انتقال بین دو قلم سولیکوآ بر اساس دوز جاری بیمار تنظیم شد.";
-            } else if (effectiveDose >= 30) {
-                newDose = 30;
-                explanation = premixSplitNotice + "سوییچ به سولیکوآ ۱۰۰/۳۳ (قلم زیتونی). برای دوزهای مساوی یا بالای ۳۰ واحد پایه، دوز شروع استاندارد پروتکل ۳۰ واحد است.";
-            } else {
-                newDose = 30;
-                explanation = premixSplitNotice + "شروع پیش‌فرض قلم زیتونی سولیکوآ طبق راهنمای کلینیکال دارو ۳۰ واحد می‌باشد.";
-            }
-        } 
-        // ۴. سناریوی معکوس: تبدیل بیزال به میکس (اضافه شدن بخش پراندیال)
+        // ۳. سناریوی معکوس: تبدیل بیزال به میکس (اضافه شدن بخش پراندیال)
         else if (fromGroup === 'basal' && toGroup === 'premix') {
             let finalMultiplier = initialMultiplier;
             let safetyWarning = "";
@@ -518,7 +509,7 @@
                 explanation += `\n\n[توزیع دوز مقصد QD]: دوز کل جدید باید به صورت یک‌بار در روز، دقیقاً قبل از بزرگ‌ترین وعده غذایی بیمار تزریق شود.`;
             }
         }
-        // ۵. تبدیل‌های عمومی و چندتزریقی با اعمال ضرایب گایدلاین‌ها
+        // ۴. تبدیل‌های عمومی و چندتزریقی با اعمال ضرایب گایدلاین‌ها
         else {
             let finalMultiplier = initialMultiplier;
             let baseExplanation = "";
@@ -592,7 +583,16 @@
             }
         }
 
-        document.getElementById('resultText').innerText = `${newDose} واحد`;
+        // لایه نهایی نمایش نتایج بر اساس نوع انسولین مقصد
+        if (insTo === 'soliqua_combined') {
+            document.getElementById('resultText').innerHTML = `
+                <div style="font-size: 15px; color: #555; font-weight: normal; margin-bottom: 4px;">${targetInsulinName}</div>
+                <div>${newDose} واحد</div>
+            `;
+        } else {
+            document.getElementById('resultText').innerText = `${newDose} واحد`;
+        }
+
         document.getElementById('descText').innerText = explanation;
         document.getElementById('resultBox').style.display = 'block';
         document.getElementById('alertBox').style.display = 'block';
