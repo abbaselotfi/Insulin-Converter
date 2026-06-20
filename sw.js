@@ -2,7 +2,10 @@ const cacheName = 'insulin-pwa-v1';
 const assets = [
   '/',
   'index.html',
-  'manifest.json'
+  'soliqua.html',
+  'manifest.json',
+  'icon-192.png',
+  'icon-512.png'
 ];
 
 self.addEventListener('install', evt => {
