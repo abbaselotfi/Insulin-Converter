@@ -3,7 +3,7 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
             .then(reg => console.log('Service Worker Registered'))
-            .catch(err => console.log('Service Worker Service failed', err));
+            .catch(err => console.error('Service Worker registration failed', err));
     });
 }
 
@@ -60,16 +60,26 @@ let deferredPrompt;
 
 // بررسی اینکه آیا کاربر قبلاً پاپ‌آپ را رد کرده است یا خیر
 const isDismissed = () => {
-    const dismissTime = localStorage.getItem('pwa_banner_dismissed_time');
-    if (!dismissTime) return false;
-    // اگر کمتر از 7 روز گذشته باشد، نشان نده
-    return (Date.now() - parseInt(dismissTime)) < (7 * 24 * 60 * 60 * 1000);
+    try {
+        const dismissTime = localStorage.getItem('pwa_banner_dismissed_time');
+        if (!dismissTime) return false;
+        // اگر کمتر از 7 روز گذشته باشد، نشان نده
+        return (Date.now() - parseInt(dismissTime)) < (7 * 24 * 60 * 60 * 1000);
+    } catch (err) {
+        // localStorage may be unavailable (private mode, disabled storage)
+        console.warn('PWA banner: unable to read dismissal state from localStorage', err);
+        return false;
+    }
 };
 
 // تابع بستن پاپ‌آپ و ذخیره در LocalStorage
 const dismissBanner = () => {
     banner.style.display = 'none';
-    localStorage.setItem('pwa_banner_dismissed_time', Date.now().toString());
+    try {
+        localStorage.setItem('pwa_banner_dismissed_time', Date.now().toString());
+    } catch (err) {
+        console.warn('PWA banner: unable to persist dismissal state to localStorage', err);
+    }
 };
 
 dismissBtn.addEventListener('click', dismissBanner);
@@ -88,12 +98,17 @@ window.addEventListener('beforeinstallprompt', (e) => {
 actionBtn.addEventListener('click', async () => {
     if (deferredPrompt) {
         banner.style.display = 'none';
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-            console.log('User accepted the install prompt');
+        try {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                console.log('User accepted the install prompt');
+            }
+        } catch (err) {
+            console.error('PWA install prompt failed', err);
+        } finally {
+            deferredPrompt = null;
         }
-        deferredPrompt = null;
     }
 });
 
