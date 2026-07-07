@@ -10,16 +10,22 @@ const assets = [
 
 self.addEventListener('install', evt => {
   evt.waitUntil(
-    caches.open(cacheName).then(cache => {
-      cache.addAll(assets);
-    })
+    caches.open(cacheName)
+      .then(cache => cache.addAll(assets))
+      .catch(err => {
+        console.error('Service Worker: failed to cache assets during install', err);
+        throw err;
+      })
   );
 });
 
 self.addEventListener('fetch', evt => {
   evt.respondWith(
-    caches.match(evt.request).then(cacheRes => {
-      return cacheRes || fetch(evt.request);
-    })
+    caches.match(evt.request)
+      .then(cacheRes => cacheRes || fetch(evt.request))
+      .catch(err => {
+        console.error('Service Worker: fetch failed and no cached response available', evt.request.url, err);
+        return Response.error();
+      })
   );
 });
