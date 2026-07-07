@@ -2,6 +2,8 @@ const cacheName = 'insulin-pwa-v1';
 const assets = [
   '/',
   'index.html',
+  'insulin-logic.js',
+  'pwa-handler.js',
   'soliqua.html',
   'manifest.json',
   'icon-192.png',
