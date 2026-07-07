@@ -1,1 +1,156 @@
-<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>سامانه پیشرفته تبدیل و محاسبه دوز انسولین</title><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0056b3"><link class="apple-touch-icon" href="icon-192.png"><style>body{font-family:'Tahoma','Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#eef2f7;color:#333;margin:0;padding:20px;display:flex;justify-content:center;align-items:center;min-height:100vh}.container{background-color:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.12);padding:28px;width:100%;max-width:500px}.soliqua-nav-btn{display:block;text-align:center;background-color:#00a86b;color:#fff;text-decoration:none;padding:12px;border-radius:8px;font-weight:700;font-size:14px;margin-bottom:20px;box-shadow:0 4px 12px rgba(0,168,107,.2);transition:background .3s}.soliqua-nav-btn:hover{background-color:#00875a}h2{color:#0056b3;text-align:center;margin-bottom:20px;font-size:22px;border-bottom:2px solid #0056b3;padding-bottom:12px}.form-group{margin-bottom:18px}label{display:block;margin-bottom:6px;font-weight:700;font-size:14px;color:#333}select,input{width:100%;padding:12px;border:1px solid #b0c4de;border-radius:8px;box-sizing:border-box;font-size:14px;font-family:inherit;background-color:#fcfdfd}select:focus,input:focus{border-color:#0056b3;outline:none;box-shadow:0 0 6px rgba(0,86,179,.3)}button{background-color:#007bff;color:#fff;border:none;padding:14px;width:100%;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;transition:background .3s,transform .1s;margin-top:10px}button:hover{background-color:#0056b3}.result-box{margin-top:24px;background-color:#e6f2ff;border-right:4px solid #0056b3;padding:18px;border-radius:0 8px 8px 0;display:none}.result-title{font-weight:700;color:#004085;margin-bottom:8px;font-size:16px}.alert-text{margin-top:16px;font-size:13px;line-height:1.4;color:#721c24;background-color:#f8d7da;padding:12px;border-radius:6px;border-left:4px solid #f5c6cb;display:none}</style></head><body><div class="container"><a href="./soliqua.html" class="soliqua-nav-btn">📘 راهنمای بالینی و ویژگی‌های قلم انسولین سولیکوآ Soliqua</a><h2>سامانه کلینیکال تبدیل انسولین</h2><div class="form-group"><label for="insFrom">انسولین جاری (مبدأ):</label><select id="insFrom" onchange="updateRegimen()"><optgroup label="انسولین‌های ترکیبی مدرن (FRC)"><option value="soliqua_50">سولیکوآ ۱۰۰/۵۰ (قلم زرد/هلویی)</option><option value="soliqua_33">سولیکوآ ۱۰۰/۳۳ (قلم زیتونی)</option></optgroup><optgroup label="انسولین‌های پایه (Basal)"><option value="lantus" selected>لانتوس (Glargine U-100)</option><option value="toujeo">توژئو (Glargine U-300)</option><option value="tresiba">دگلودک (Tresiba)</option><option value="levemir">لِومیر (Detemir)</option><option value="nph_basal">ان‌پی‌اچ (NPH)</option></optgroup><optgroup label="انسولین‌های مخلوط (Premixed)"><option value="novomix">نوومیکس ۳۰ (NovoMix)</option><option value="humalog_mix_25">هومالوگ میکس ۲۵ (Humalog Mix 25)</option><option value="humalog_mix_50">هومالوگ میکس ۵۰ (Humalog Mix 50)</option><option value="ryzodeg">رایزودگ (Ryzodeg)</option><option value="human_mix">مخلوط انسانی ۷۰/۳۰ (Human Mix)</option></optgroup><optgroup label="انسولین‌های سریع‌الاثر (Bolus)"><option value="apidra_novorapid">آنالوگ سریع (NovoRapid / Apidra)</option><option value="regular">رگولار انسانی (Regular)</option></optgroup></select></div><div class="form-group" id="freqFromBox" style="display:none"><label for="freqFrom">⏱️ فرکانس تزریق انسولین مبدأ:</label><select id="freqFrom" onchange="updateRegimen()"><option value="1">۱ بار در روز (QD)</option><option value="2">۲ بار در روز (BID)</option><option value="3">۳ بار در روز (TID)</option></select></div><div class="form-group"><label for="insTo">انسولین جایگزین (مقصد):</label><select id="insTo" onchange="updateRegimen()"><optgroup label="انسولین‌های ترکیبی مدرن (FRC)"><option value="soliqua_combined">Soliqua 100/50 یا Soliqua 100/33</option></optgroup><optgroup label="انسولین‌های پایه (Basal)"><option value="lantus">لانتوس (Glargine U-100)</option><option value="toujeo">توژئو (Glargine U-300)</option><option value="tresiba">دگلودک (Tresiba)</option><option value="levemir">لِومیر (Detemir)</option><option value="nph_basal">ان‌پی‌اچ (NPH)</option></optgroup><optgroup label="انسولین‌های مخلوط (Premixed)"><option value="novomix">نوومیکس ۳۰ (NovoMix)</option><option value="humalog_mix_25">هومالوگ میکس ۲۵ (Humalog Mix 25)</option><option value="humalog_mix_50">هومالوگ میکس ۵۰ (Humalog Mix 50)</option><option value="ryzodeg">رایزودگ (Ryzodeg)</option><option value="human_mix">مخلوط انسانی ۷۰/۳۰ (Human Mix)</option></optgroup><optgroup label="انسولین‌های سریع‌الاثر (Bolus)"><option value="apidra_novorapid">آنالوگ سریع (NovoRapid / Apidra)</option><option value="regular">رگولار انسانی (Regular)</option></optgroup></select></div><div class="form-group" id="freqToBox" style="display:none"><label for="freqTo">⏱️ فرکانس تزریق انسولین مقصد:</label><select id="freqTo" onchange="updateRegimen()"><option value="1">۱ بار در روز (QD)</option><option value="2">۲ بار در روز (BID)</option><option value="3">۳ بار در روز (TID)</option></select></div><div class="form-group"><label for="currentDose">💊 دوز کل فعلی بیمار در ۲۴ ساعت (Total Daily Dose):</label><input type="number" id="currentDose" placeholder="مثلاً 30" min="1" max="120"></div><div class="form-group"><label for="guideline">📚 انتخاب گایدلاین مرجع:</label><select id="guideline" onchange="updateStrategies()"></select></div><div class="form-group" id="strategyBox"><label for="strategy">استراتژی بالینی کاهش دوز:</label><select id="strategy"><option value="0.8">کاهش ۲۰ درصدی دوز</option><option value="1.0">پایش مستقیم بالینی دوز معادل</option><option value="0.85">کاهش ۱۵ درصدی دوز</option></select></div><button onclick="convertInsulin()">محاسبه کلینیکال دوز</button><div class="result-box" id="resultBox"><div class="result-title">💡 دوز پیشنهادی جدید:</div><div id="resultText" style="font-size:20px;line-height:1.5"></div><div id="descText" style="margin-top:10px;font-size:14px;line-height:1.4"></div></div><div class="alert-text" id="alertBox"><strong>⚠️ هشدار بالینی مهم:</strong> محاسبات بر اساس فرمول‌های ریاضی گایدلاین منتخب استخراج شده است. پاسخ بیولوژیک بیمار و تیتراسیون بالینی همواره ارجحیت دارد.</div></div><script>function getGroupType(e){return["lantus","toujeo","tresiba","levemir","nph_basal"].includes(e)?"basal":["novomix","humalog_mix_25","humalog_mix_50","ryzodeg","human_mix"].includes(e)?"premix":"soliqua_50"===e||"soliqua_33"===e||"soliqua_combined"===e?"soliqua":"apidra_novorapid"===e||"regular"===e?"bolus":"basal"}function updateRegimen(){const e=document.getElementById("insFrom"),t=document.getElementById("insTo");let n=e.value,a=getGroupType(n);const o=t.getElementsByTagName("optgroup");for(let e of o){let t=!1;const o=e.getElementsByTagName("option");for(let i of o){const o=getGroupType(i.value);let l=!0;n===i.value&&(l=!1),"soliqua"===a&&"soliqua"===o&&(l=!1),"bolus"===a&&"bolus"!==o&&(l=!1),"bolus"!==a&&"bolus"===o&&(l=!1),i.disabled=!l,i.style.display=l?"block":"none",l&&(t=!0)}e.style.display=t?"block":"none",e.disabled=!t}let i=t.options[t.selectedIndex];if(!i||i.disabled||"none"===i.style.display)for(let e of t.options)if(!e.disabled&&"none"!==e.style.display){t.value=e.value;break}let l=t.value,s=getGroupType(l);const r=document.getElementById("guideline"),u=r.value;r.innerHTML="",n.includes("soliqua")||l.includes("soliqua")?r.innerHTML='<option value="sanofi">پروتکل رسمی Sanofi / EMA / FDA (پیش‌فرض)</option><option value="ada">گایدلاین ADA</option>':(r.innerHTML='<option value="ada">گایدلاین ADA</option><option value="aace">گایدلاین AACE</option><option value="canadian">گایدلاین Diabetes Canada</option><option value="nice">گایدلاین NICE</option>',["ada","aace","canadian","nice"].includes(u)&&(r.value=u));const d=["toujeo","tresiba","soliqua_50","soliqua_33","soliqua_combined"],c=document.getElementById("freqFromBox"),m=document.getElementById("freqFrom");if(!d.includes(n)&&"bolus"!==a){if(c.style.display="block","premix"===a&&"ryzodeg"!==n){if(m.options.length<3){let e=document.createElement("option");e.value="3",e.text="۳ بار در روز (TID)",m.add(e)}}else m.options.length>2&&("3"===m.value&&(m.value="2"),m.remove(2))}else c.style.display="none",m.value="1";const v=document.getElementById("freqToBox"),g=document.getElementById("freqTo");if(!d.includes(l)&&"bolus"!==s){if(v.style.display="block","premix"===s&&"ryzodeg"!==l){if(g.options.length<3){let e=document.createElement("option");e.value="3",e.text="۳ بار در روز (TID)",g.add(e)}}else g.options.length>2&&("3"===g.value&&(g.value="2"),g.remove(2))}else v.style.display="none",g.value="1";const y=document.getElementById("strategyBox");l.includes("soliqua")||"bolus"===a?y.style.display="none":(y.style.display="block",updateStrategies())}function updateStrategies(){const e=document.getElementById("guideline").value,t=document.getElementById("strategy");if(!t)return;const n="none"!==document.getElementById("freqFromBox").style.display&&"2"===document.getElementById("freqFrom").value,a="none"!==document.getElementById("freqFromBox").style.display&&"3"===document.getElementById("freqFrom").value,o="none"!==document.getElementById("freqToBox").style.display&&"2"===document.getElementById("freqTo").value,i="none"!==document.getElementById("freqToBox").style.display&&"3"===document.getElementById("freqTo").value;let l="";"ada"===e&&(l="ADA"),"aace"===e&&(l="AACE"),"canadian"===e&&(l="Diabetes Canada"),"nice"===e&&(l="NICE"),"sanofi"===e&&(l="Sanofi");a?(t.options[0].text=`کاهش ۲۰ درصدی دوز (رویکرد الزامی گایدلاین‌ها در رژیم مبدأ TID)`,t.options[1].text=`رویکرد استاندارد گایدلاین ${l}`,t.options[2].text=`کاهش ۱۵ درصدی دوز (حداقل تعدیل محافظه‌کارانه)`,t.value="0.8"):n?(t.options[0].text=`کاهش ۲۰ درصدی دوز (رویکرد الزامی بر اساس رژیم BID مبدأ)`,t.options[1].text=`رویکرد استاندارد گایدلاین ${l}`,t.options[2].text=`کاهش ۱۵ درصدی دوز (حداقل تعدیل محافظه‌کارانه)`,t.value="0.8"):i||o?(t.options[0].text=`کاهش ۲۰ درصدی دوز (رویکرد فوق‌محافظه‌کارانه در رژیم مقصد چندتزریقی)`,t.options[1].text=`رویکرد استاندارد گایدلاین ${l}`,t.options[2].text=`کاهش ۱۵ درصدی دوز (تعدیل احتیاطی بالینی)`,t.value="1.0"):(t.options[0].text=`کاهش ۲۰ درصدی دوز (رویکرد محافظه‌کارانه بر اساس گایدلاین ${l})`,t.options[1].text=`رویکرد استاندارد گایدلاین ${l}`,t.options[2].text=`کاهش ۱۵ درصدی دوز (تعدیل استاندارد بالینی بر اساس گایدلاین ${l})`,t.value="1.0")}function convertInsulin(){const e=parseFloat(document.getElementById("currentDose").value),t=document.getElementById("insFrom").value,n=document.getElementById("insTo").value,a=document.getElementById("guideline").value,o="none"!==document.getElementById("freqFromBox").style.display&&"2"===document.getElementById("freqFrom").value,i="none"!==document.getElementById("freqFromBox").style.display&&"3"===document.getElementById("freqFrom").value,l="none"!==document.getElementById("freqToBox").style.display&&"2"===document.getElementById("freqTo").value,s="none"!==document.getElementById("freqToBox").style.display&&"3"===document.getElementById("freqTo").value;let r=parseFloat(document.getElementById("strategy").value);if(isNaN(e)||e<=0){alert("لطفاً دوز معتبری وارد کنید.");return}let u=0,d="",c=getGroupType(t),m=getGroupType(n),v="",g="#333",y=e,p="";if("premix"===c&&("basal"===m||"soliqua"===m)){let e=.7,n="نوومیکس/میکس انسانی/رایزودگ (نسبت ۷۰٪ بیزال)";"humalog_mix_25"===t?(e=.75,n="هومالوگ میکس ۲۵ (نسبت ۷۵٪ بیزال)"):"humalog_mix_50"===t&&(e=.5,n="هومالوگ میکس ۵۰ (نسبت ۵۰٪ بیزال)"),y=e*e,p=`با توجه به اینکه انسولین مبدأ از نوع مخلوط ${n} است، ابتدا سهم بخش پایه‌ای (بیزال) آن یعنی ${y.toFixed(1)} واحد استخراج گردید. `}if("bolus"===c)u=Math.round(e),d="تبدیل انسولین‌های سریع‌الاثر/بولوس: طبق راهنماهای بالینی، تعویض بین آنالوگ‌های سریع هم‌گروه (مانند نوورپید به آپیدرا) کاملاً به صورت مستقیم و واحدبه-واحد (1:1) انجام می‌شود.";else if("soliqua_combined"===n){let e=y,n="";"toujeo"===t&&(e=.8*y,n="با توجه به سوییچ از انسولین توژئو (Glargine U-300)، طبق دستورالعمل رسمی سازنده سولیکوآ، کاهش ساختاری ۲۰٪ جهت ایمنی بالینی و بروز غلظت تزریق اعمال شد. "),e>=30?(u=30,v="Insulin FRC Soliqua 100/33",g="#446600",d=p+n+"سوییچ به سولیکوآ: دوز انسولین پایه محاسباتی شما ۳۰ واحد یا بالاتر (در بازه ۳۰ تا ۶۰ واحد) است؛ بنابراین قلم Insulin FRC Soliqua 100/33 تعیین شد. جهت پیشگیری از عوارض گوارشی شدید (تهوع/استفراغ حاد) ناشی از جزء لایکسیزناتاید، دوز شروع درمان طبق گایدلاین باید دقیقاً روی دوز پایه‌ی ۳۰ واحد قفل (Cap) شده و سپس تیتراسیون انجام شود."):e>=20&&e<30?(u=20,v="Insulin FRC Soliqua 100/50",g="#d66800",d=p+n+"سوییچ به سولیکوآ: دوز انسولین پایه محاسباتی شما بین ۲۰ تا ۲۹ واحد است؛ بنابراین قلم Insulin FRC Soliqua 100/50 تعیین شد. طبق پروتکل رسمی سازنده، برای غلبه بر عوارض ناخواسته گوارشی داروی ترکیبی، دوز شروع درمان دقیقاً روی دوز ایمن ۲۰ واحد فیکس شده و افزایش دوز بر اساس تیتراسیون صورت می‌گیرد."):(u=10,v="Insulin FRC Soliqua 100/50",g="#d66800",d=p+n+"سوییچ به سولیکوآ: به دلیل دوز پایه پایین قبلی (کمتر از ۲۰ واحد)، قلم Insulin FRC Soliqua 100/50 انتخاب شده و دوز شروع ایمن از کف دوز رسمی قلم یعنی ۱۰ واحد تعیین گردید.")}else if("basal"===c&&"premix"===m){let t=r,n="";"humalog_mix_50"===n&&(t=Math.min(t,.8),n="⚠️ هشدار اختصاصی: انسولین مقصد (هومالوگ میکس ۵۰) حاوی ۵۰٪ انسولین سریع‌الاثر است. جهت پیشگیری از هیپوگلیسمی حاد بعد از غذا، کاهش دوز ۲۰٪ به صورت پیش‌فرض اعمال شد. "),u=Math.round(e*t),d=n+`سوییچ از انسولین پایه به انسولین میکس با ضریب ${t} انجام شد. دوز کل جدید روزانه ${u} واحد می‌باشد. `,l?益(u):s?function(e){let t=Math.round(.4*e),n=Math.round(.3*e),a=e-(t+n);d+=`\\n\\n[توزیع دوز مقصد TID]: رژیم تهاجمی چندتزریقی؛ دوز کل پیشنهادی بین سه وعده تقسیم شود (${t} واحد صبح / ${n} واحد ظهر / ${a} واحد شب). پایش مداوم قند خون (SMBG) الزامی است.`}(u):d+="\n\n[توزیع دوز مقصد QD]: دوز کل جدید باید به صورت یک‌بار در روز، دقیقاً قبل از بزرگ‌ترین وعده غذایی بیمار تزریق شود."}else{let t=r,l="";"ada"===a?"toujeo"===t&&"lantus"===n?(t=.8,l="ملاک اختصاصی ADA: در تبدیل توژئو به لانتوس، اعمال کاهش ۲۰٪ دوز جهت ایمنی الزامی است. "):"nph_basal"===t&&["lantus","toujeo","tresiba"].includes(n)?(t=.8,l="ملاک اختصاصی ADA: تغییر از NPH به آنالوگ‌های پیشرفته طولانی‌اثر، نیازمند کاهش دوز ۲۰٪ است. "):"premix"===c||"premix"===m?(t=.8,l="توصیه عمومی ADA: در تعویض رژیم‌های حاوی مخلوط (Premix)، فرمول با اعمال ۲۰٪ کاهش احتیاطی محاسبه می‌شود. "):l=`پروتکل دوز بر مبنای معیار انتخابی ADA با ضریب ${t} تنظیم شد. `:"aace"===a?c!==m||t!==n?(t=Math.min(t,.8),l="الگوریتم محافظه‌کارانه AACE: در سوییچ‌های بین‌کلاسی یا تغییر برند انسولین، کاهش ۲۰ درصدی دوز قفل می‌شود. "):(t=Math.min(t,.85),l=`رویکرد کنترلی AACE: اعمال کاهش دوز احتیاطی با ضریب ${t} لحاظ گردید. `):"canadian"===a?"basal"===c&&"basal"===m&&"toujeo"!==t?l="دستورالعمل Diabetes Canada: این گایدلاین تعویض آنالوگ‌های پایه هم‌سطح را به صورت مستقیم (1:1) مجاز می‌داند. ":"nph_basal"===t?(t=.8,l="معیار Diabetes Canada: انتقال دوز از NPH به آنالوگ‌های مدرن شامل کاهش ساختاری ۲۰ درصدی دوز کل است. "):l=`محاسبه بر اساس استراتژی منتخب در گایدلاین Diabetes Canada با ضریب ${t} انجام شد. `:"nice"===a&&("premix"===c||"nph_basal"===t?(t=.8,l="راهنمای کلینیکال NICE: انتقال از ساختارهای سنتی یا مخلوط به آنالوگ‌های خالص، شامل کاهش ۲۰ درصدی دوز پایه کل است. "):l=`محاسبه بر اساس استراتژی منتخب در گایدلاین NICE با ضریب ${t} انجام شد. `),i?(t=Math.min(t,.8),d=p+"تعدیل رژیم پیچیده (TID Premix به Basal QD): با توجه به فرکانس ۳ بار در روز انسولین میکس، سهم پایه استخراج و به دلیل حذف کامل دوزهای سریع‌الاثر، کاهش دوز ۲۰ درصدی جهت پیشگیری از تجمع دوز اعمال شد. "+l):o?(t=Math.min(t,.8),d=p+"تعدیل فرکانس (BID به QD): به دلیل فرکانس ۲ بار در روز انسولین مبدأ, جهت جلوگیری از تجمع دوز در یک نوبت، کاهش دوز ۲۰ درصدی بر محاسبات اعمال شد. "+l):l?1.0===initialMultiplier&&1.0===t?d=p+"دستورالعمل بالینی QD به BID: در این نوع سوییچ، تبدیل ۱:۱ توصیه اصلی است؛ زیرا شکستن دوز به دو نوبت، خودبه‌خود ریسک پیک غلظتی را کنترل می‌کند. "+l:d=p+`محاسبه دوز با ضریب تعدیل بالینی نهایی ${t} جهت انتقال ایمن به رژیم مقصد BID انجام شد. `+l:d=p+l,u=Math.round(y*t),l&&!o&&(d+=`\\n\\n[توزیع دوز مقصد BID]: پیشنهاد می‌شود دوز کل به صورت ۵۰:۵۰ تقسیم گردد (${Math.round(.5*u)} واحد صبح / ${u-Math.round(.5*u)} واحد شب) یا طبق متد بالینی ۲/۳ صبح و ۱/۳ شب تجویز شود.`)}"soliqua_combined"===n?document.getElementById("resultText").innerHTML=`<div style="font-size: 16px; color: ${g}; font-weight: bold; margin-bottom: 4px;">${v}</div><div style="font-size: 24px; font-weight: bold; color: #004085;">${u} واحد</div>`:document.getElementById("resultText").innerHTML=`<div style="font-size: 24px; font-weight: bold; color: #004085;">${u} واحد</div>`,document.getElementById("descText").innerText=d,document.getElementById("resultBox").style.display="block",document.getElementById("alertBox").style.display="block"}function 益(e){let t=Math.round(.66*e),n=e-t;d+=`\\n\\n[توزیع دوز مقصد BID]: پیشنهاد می‌شود دوز کل به صورت ۲/۳ قبل از صبحانه (${t} واحد) و ۱/۳ قبل از شام (${n} واحد) تزریق گردد.`}window.onload=function(){updateRegimen()};</script><script src="pwa-handler.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سامانه پیشرفته تبدیل و محاسبه دوز انسولین</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0056b3">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        .container { max-width: 500px; }
+        h2 { color: #0056b3; margin-bottom: 20px; font-size: 22px; border-bottom: 2px solid #0056b3; }
+        .soliqua-nav-btn {
+            background-color: #00a86b;
+            color: #fff;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 168, 107, 0.2);
+        }
+        .soliqua-nav-btn:hover { background-color: #00875a; }
+        .result-box {
+            margin-top: 24px;
+            background-color: #e6f2ff;
+            border-right: 4px solid #0056b3;
+            padding: 18px;
+            border-radius: 0 8px 8px 0;
+            display: none;
+        }
+        .result-title { font-weight: 700; color: #004085; margin-bottom: 8px; font-size: 16px; }
+        .alert-text {
+            margin-top: 16px;
+            font-size: 13px;
+            line-height: 1.4;
+            color: #721c24;
+            background-color: #f8d7da;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #f5c6cb;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="./soliqua.html" class="nav-btn soliqua-nav-btn">📘 راهنمای بالینی و ویژگی‌های قلم انسولین سولیکوآ Soliqua</a>
+
+    <h2>سامانه کلینیکال تبدیل انسولین</h2>
+
+    <div class="form-group">
+        <label for="insFrom">انسولین جاری (مبدأ):</label>
+        <select id="insFrom" onchange="updateRegimen()">
+            <optgroup label="انسولین‌های ترکیبی مدرن (FRC)">
+                <option value="soliqua_50">سولیکوآ ۱۰۰/۵۰ (قلم زرد/هلویی)</option>
+                <option value="soliqua_33">سولیکوآ ۱۰۰/۳۳ (قلم زیتونی)</option>
+            </optgroup>
+            <optgroup label="انسولین‌های پایه (Basal)">
+                <option value="lantus" selected>لانتوس (Glargine U-100)</option>
+                <option value="toujeo">توژئو (Glargine U-300)</option>
+                <option value="tresiba">دگلودک (Tresiba)</option>
+                <option value="levemir">لومیر (Detemir)</option>
+                <option value="nph_basal">ان‌پی‌اچ (NPH)</option>
+            </optgroup>
+            <optgroup label="انسولین‌های مخلوط (Premixed)">
+                <option value="novomix">نوومیکس ۳۰ (NovoMix)</option>
+                <option value="humalog_mix_25">هومالوگ میکس ۲۵ (Humalog Mix 25)</option>
+                <option value="humalog_mix_50">هومالوگ میکس ۵۰ (Humalog Mix 50)</option>
+                <option value="ryzodeg">رایزودگ (Ryzodeg)</option>
+                <option value="human_mix">مخلوط انسانی ۷۰/۳۰ (Human Mix)</option>
+            </optgroup>
+            <optgroup label="انسولین‌های سریع‌الاثر (Bolus)">
+                <option value="apidra_novorapid">آنالوگ سریع (NovoRapid / Apidra)</option>
+                <option value="regular">رگولار انسانی (Regular)</option>
+            </optgroup>
+        </select>
+    </div>
+
+    <div class="form-group" id="freqFromBox" style="display:none">
+        <label for="freqFrom">⏱ فرکانس تزریق انسولین مبدأ:</label>
+        <select id="freqFrom" onchange="updateRegimen()">
+            <option value="1">۱ بار در روز (QD)</option>
+            <option value="2">۲ بار در روز (BID)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="insTo">انسولین جایگزین (مقصد):</label>
+        <select id="insTo" onchange="updateRegimen()">
+            <optgroup label="انسولین‌های ترکیبی مدرن (FRC)">
+                <option value="soliqua_combined">Soliqua 100/50 یا Soliqua 100/33</option>
+            </optgroup>
+            <optgroup label="انسولین‌های پایه (Basal)">
+                <option value="lantus">لانتوس (Glargine U-100)</option>
+                <option value="toujeo">توژئو (Glargine U-300)</option>
+                <option value="tresiba">دگلودک (Tresiba)</option>
+                <option value="levemir">لومیر (Detemir)</option>
+                <option value="nph_basal">ان‌پی‌اچ (NPH)</option>
+            </optgroup>
+            <optgroup label="انسولین‌های مخلوط (Premixed)">
+                <option value="novomix">نوومیکس ۳۰ (NovoMix)</option>
+                <option value="humalog_mix_25">هومالوگ میکس ۲۵ (Humalog Mix 25)</option>
+                <option value="humalog_mix_50">هومالوگ میکس ۵۰ (Humalog Mix 50)</option>
+                <option value="ryzodeg">رایزودگ (Ryzodeg)</option>
+                <option value="human_mix">مخلوط انسانی ۷۰/۳۰ (Human Mix)</option>
+            </optgroup>
+            <optgroup label="انسولین‌های سریع‌الاثر (Bolus)">
+                <option value="apidra_novorapid">آنالوگ سریع (NovoRapid / Apidra)</option>
+                <option value="regular">رگولار انسانی (Regular)</option>
+            </optgroup>
+        </select>
+    </div>
+
+    <div class="form-group" id="freqToBox" style="display:none">
+        <label for="freqTo">⏱ فرکانس تزریق انسولین مقصد:</label>
+        <select id="freqTo" onchange="updateRegimen()">
+            <option value="1">۱ بار در روز (QD)</option>
+            <option value="2">۲ بار در روز (BID)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="currentDose">💊 دوز کل فعلی بیمار در ۲۴ ساعت (Total Daily Dose):</label>
+        <input type="number" id="currentDose" placeholder="مثلا 30" min="1" max="120">
+    </div>
+
+    <div class="form-group">
+        <label for="guideline">📚 انتخاب گایدلاین مرجع:</label>
+        <select id="guideline" onchange="updateStrategies()"></select>
+    </div>
+
+    <div class="form-group" id="strategyBox">
+        <label for="strategy">استراتژی بالینی کاهش دوز:</label>
+        <select id="strategy">
+            <option value="0.8">کاهش ۲۰ درصدی دوز</option>
+            <option value="1.0">پایش مستقیم بالینی دوز معادل</option>
+            <option value="0.85">کاهش ۱۵ درصدی دوز</option>
+        </select>
+    </div>
+
+    <button onclick="convertInsulin()">محاسبه کلینیکال دوز</button>
+
+    <div class="result-box" id="resultBox">
+        <div class="result-title">💡 دوز پیشنهادی جدید:</div>
+        <div id="resultText" style="font-size:20px;line-height:1.5"></div>
+        <div id="descText" style="margin-top:10px;font-size:14px;line-height:1.4"></div>
+    </div>
+
+    <div class="alert-text" id="alertBox">
+        <strong>⚠ هشدار بالینی مهم:</strong> محاسبات بر اساس فرمول‌های ریاضی گایدلاین منتخب استخراج شده است. پاسخ بیولوژیک بیمار و تیتراسیون بالینی همواره ارجحیت دارد.
+    </div>
+</div>
+
+<script src="converter.js"></script>
+<script src="pwa-handler.js"></script>
+</body>
+</html>
