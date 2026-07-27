@@ -21,16 +21,18 @@ The platform turns authoritative ADA and EASD guidance into traceable, versioned
 
 ## اجرای محلی / Run locally
 
-این نسخه وابستگی اجرایی شخص ثالث ندارد. در ریشهٔ مخزن اجرا کنید:
+Node.js 22 یا جدیدتر لازم است. در ریشهٔ مخزن اجرا کنید:
 
 ```bash
-python3 -m http.server 8000
+npm install
+npm run dev
 ```
 
-سپس `http://localhost:8000` را باز کنید. آزمون موتور بالینی:
+آدرس محلی اعلام‌شده توسط Vite (معمولاً `http://localhost:5173`) را باز کنید. آزمون و build تولید:
 
 ```bash
-node tests/clinical-engine.test.js
+npm test
+npm run build
 ```
 
 ## قابلیت‌های هدف / Planned capabilities
@@ -43,6 +45,23 @@ node tests/clinical-engine.test.js
 - پنل مدیریت دوزبانه برای کاربران غیر برنامه‌نویس با گردش‌کار پیش‌نویس، بازبینی، تأیید و انتشار؛
 - داشبورد مدیریتی برای مشاهدهٔ تعداد کاربران و میزان استفاده از سامانه با رعایت حریم خصوصی؛
 - ثبت رویدادهای ممیزی و امکان بازسازی خروجی تاریخی سامانه.
+
+## ساختار اجرایی فعلی
+
+```text
+src/
+  App.tsx                 # رابط React و جریان ماشین‌حساب
+  clinical/engine.js      # موتور مستقل محاسبات و قواعد ایمنی
+  clinical/engine.test.js # آزمون‌های Vitest
+  i18n/translations.ts    # ترجمه‌های فارسی و انگلیسی
+  main.tsx                # نقطهٔ ورود برنامه
+  styles.css              # طراحی واکنش‌گرا و RTL/LTR
+public/                   # Manifest، Service Worker، آیکن‌ها و صفحات ثابت
+.github/workflows/        # آزمون، build و استقرار GitHub Pages
+```
+
+`index.html` فقط میزبان استاندارد Vite است؛ رابط برنامه به شکل مؤلفه‌ای در React نگهداری می‌شود و
+خروجی production از طریق `npm run build` در `dist/` ساخته می‌شود.
 
 ## اصول ایمنی
 
@@ -62,7 +81,7 @@ node tests/clinical-engine.test.js
 | [راهبرد به‌روزرسانی راهنما](docs/GUIDELINE_UPDATE_STRATEGY.md) | دریافت، تطبیق، آزمون، انتشار و بازگشت نسخه‌های ADA/EASD |
 | [ثبت منابع بالینی](docs/CLINICAL_SOURCES.md) | منابع پیاده‌سازی‌شده، تاریخ بازبینی و مرز تأیید قواعد |
 
-## ساختار پیشنهادی مخزن
+## ساختار بلندمدت پیشنهادی مخزن
 
 ```text
 apps/

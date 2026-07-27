@@ -1,11 +1,7 @@
-const cacheName = 'diabeto-v3';
+const cacheName = 'diabeto-v4';
 const assets = [
   './',
   './index.html',
-  './styles.css',
-  './app.js',
-  './clinical-engine.js',
-  './docs/CLINICAL_SOURCES.md',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'
@@ -26,6 +22,7 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', evt => {
+  if (evt.request.method !== 'GET' || new URL(evt.request.url).origin !== self.location.origin) return;
   evt.respondWith(
     caches.match(evt.request).then(cacheRes => {
       return cacheRes || fetch(evt.request).then(response => {
