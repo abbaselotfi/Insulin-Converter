@@ -1,8 +1,8 @@
 {
-  "short_name": "مبدل انسولین",
-  "name": "سامانه جامع و هوشمند تبدیل انسولین بالینی",
-  "description": "ابزار بالینی هوشمند برای تبدیل دوز و سوییچ انواع انسولین بر اساس گایدلاین‌های ADA و AACE",
-  "id": "/Insulin-Converter/",
+  "short_name": "Diabeto",
+  "name": "Diabeto Clinical Platform",
+  "description": "Bilingual clinical decision-support workspace for diabetes care",
+  "id": "./",
   "categories": ["medical", "productivity"],
   "icons": [
     {
@@ -18,9 +18,10 @@
       "purpose": "any"
     }
   ],
-  "start_url": "index.html",
-  "background_color": "#eef2f7",
-  "theme_color": "#0056b3",
+  "start_url": "./index.html",
+  "scope": "./",
+  "background_color": "#f4f8f7",
+  "theme_color": "#0c766e",
   "display": "standalone",
   "orientation": "portrait"
 }
