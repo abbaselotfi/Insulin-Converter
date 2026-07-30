@@ -1,7 +1,7 @@
 {
-  "short_name": "Diabeto",
-  "name": "Diabeto Clinical Platform",
-  "description": "Bilingual clinical decision-support workspace for diabetes care",
+  "short_name": "ICon",
+  "name": "ICon Clinical Insulin Converter",
+  "description": "Bilingual clinical insulin conversion decision-support tool",
   "id": "./",
   "categories": ["medical", "productivity"],
   "icons": [
