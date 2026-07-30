@@ -108,14 +108,15 @@
               <form class="calculator-card" id="conversionForm" novalidate>
                 <div class="form-section-title"><span>۱</span><div><strong data-i18n="currentRegimen">رژیم فعلی</strong><small data-i18n="requiredFields">تمام فیلدها الزامی هستند</small></div></div>
                 <div class="field-grid">
-                  <label class="field"><span data-i18n="currentInsulin">انسولین فعلی</span><select id="sourceInsulin" required></select></label>
+                  <label class="field"><span data-i18n="currentInsulin">درمان فعلی</span><select id="sourceInsulin" required></select></label>
                   <label class="field"><span data-i18n="dailyDose">دوز کل روزانه</span><span class="input-with-unit"><input id="currentDose" type="number" min="1" max="300" inputmode="decimal" placeholder="24" required /><b data-i18n="units">واحد</b></span><small data-i18n="doseHelp">مجموع واحد تزریق‌شده طی ۲۴ ساعت</small></label>
+                  <label class="field" id="frequencyField" hidden><span data-i18n="injectionsPerDay">تعداد تزریق در روز</span><select id="sourceFrequency"></select><small data-i18n="frequencyHelp">دوز ورودی باید مجموع تمام تزریق‌های ۲۴ ساعت باشد.</small></label>
                 </div>
 
                 <div class="form-divider"></div>
                 <div class="form-section-title"><span>۲</span><div><strong data-i18n="newRegimen">رژیم جایگزین</strong><small data-i18n="selectTarget">انسولین و رویکرد محاسبه را انتخاب کنید</small></div></div>
                 <div class="field-grid">
-                  <label class="field"><span data-i18n="targetInsulin">انسولین مقصد</span><select id="targetInsulin" required></select></label>
+                  <label class="field"><span data-i18n="targetInsulin">درمان مقصد</span><select id="targetInsulin" required></select></label>
                   <label class="field"><span data-i18n="safetyApproach">رویکرد محاسبه</span><select id="strategy"><option value="1" data-i18n="oneToOne">معادل ۱:۱</option><option value="0.8" data-i18n="reduceTwenty">کاهش احتیاطی ۲۰٪</option></select><small data-i18n="strategyHelp">انتخاب ضریب باید بر مبنای منبع معتبر و شرایط بیمار باشد.</small></label>
                 </div>
 
@@ -129,8 +130,11 @@
                   <span class="result-label" data-i18n="estimatedDose">برآورد دوز شروع</span>
                   <div class="dose-result"><strong id="resultDose">—</strong><span data-i18n="unitsPerDay">واحد در روز</span></div>
                   <div class="calculation-line"><span id="calculationText"></span></div>
+                  <div id="penResult" class="pen-result" hidden></div>
+                  <p id="resultNote" class="result-note"></p>
                   <dl class="result-details"><div><dt data-i18n="from">مبدأ</dt><dd id="resultSource"></dd></div><div><dt data-i18n="to">مقصد</dt><dd id="resultTarget"></dd></div><div><dt data-i18n="factor">ضریب</dt><dd id="resultFactor"></dd></div></dl>
                   <div class="clinical-warning"><strong data-i18n="beforeUse">پیش از استفاده بالینی</strong><p data-i18n="beforeUseText">قند خون، سابقه هیپوگلیسمی، عملکرد کلیه و کبد، زمان‌بندی تزریق و اطلاعات رسمی فرآورده را بررسی کنید.</p></div>
+                  <div class="clinical-sources"><strong>منابع قواعد</strong><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12690185/" target="_blank" rel="noopener">ADA Standards of Care 2026، بخش ۹</a><a href="https://www.ema.europa.eu/en/documents/product-information/suliqua-epar-product-information_en.pdf" target="_blank" rel="noopener">Suliqua EU Product Information</a><small>کاهش ۲۰٪ برای رژیم چندتزریقی در این ابزار یک قاعده محافظه‌کارانه است و نباید به‌عنوان تبدیل عمومی و صریح ADA برای همه انسولین‌ها تفسیر شود.</small></div>
                   <button class="secondary-button" id="resetButton" type="button" data-i18n="newCalculation">محاسبه جدید</button>
                 </div>
               </aside>
