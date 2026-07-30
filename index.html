@@ -100,8 +100,8 @@
           <section class="view" id="converter" aria-labelledby="converterTitle">
             <button class="back-button" type="button" data-open-section="home">→ <span data-i18n="backDashboard">بازگشت به داشبورد</span></button>
             <div class="page-heading">
-              <div><span class="eyebrow" data-i18n="calculator">Calculator</span><h1 id="converterTitle" data-i18n="insulinConverter">تبدیل انسولین</h1><p data-i18n="converterIntro">یک برآورد اولیه و قابل پیگیری برای تغییر انسولین پایه ایجاد کنید.</p></div>
-              <span class="version-badge">Engine v0.1</span>
+              <div><span class="eyebrow" data-i18n="calculator">Calculator</span><h1 id="converterTitle" data-i18n="insulinConverter">تبدیل انسولین</h1><p data-i18n="converterIntro">تبدیل بیزال، میکس، پرندیال، FRC و راهنمای سوییچ GLP-1 را بر اساس مسیر درمان بررسی کنید.</p></div>
+              <span class="version-badge">Engine v0.2</span>
             </div>
 
             <div class="calculator-layout">
@@ -109,15 +109,17 @@
                 <div class="form-section-title"><span>۱</span><div><strong data-i18n="currentRegimen">رژیم فعلی</strong><small data-i18n="requiredFields">تمام فیلدها الزامی هستند</small></div></div>
                 <div class="field-grid">
                   <label class="field"><span data-i18n="currentInsulin">درمان فعلی</span><select id="sourceInsulin" required></select></label>
-                  <label class="field"><span data-i18n="dailyDose">دوز کل روزانه</span><span class="input-with-unit"><input id="currentDose" type="number" min="1" max="300" inputmode="decimal" placeholder="24" required /><b data-i18n="units">واحد</b></span><small data-i18n="doseHelp">مجموع واحد تزریق‌شده طی ۲۴ ساعت</small></label>
+                  <label class="field" id="doseField"><span data-i18n="dailyDose">دوز کل روزانه</span><span class="input-with-unit"><input id="currentDose" type="number" min="1" max="300" inputmode="decimal" placeholder="24" required /><b data-i18n="units">واحد</b></span><small data-i18n="doseHelp">مجموع واحد تزریق‌شده طی ۲۴ ساعت</small></label>
                   <label class="field" id="frequencyField" hidden><span data-i18n="injectionsPerDay">تعداد تزریق در روز</span><select id="sourceFrequency"></select><small data-i18n="frequencyHelp">دوز ورودی باید مجموع تمام تزریق‌های ۲۴ ساعت باشد.</small></label>
+                  <label class="field" id="weightField" hidden><span data-i18n="weight">وزن بیمار</span><span class="input-with-unit"><input id="weightKg" type="number" min="30" max="300" inputmode="decimal" placeholder="80" /><b>kg</b></span><small data-i18n="weightHelp">برای محاسبه بازه شروع بازال از GLP-1 لازم است.</small></label>
                 </div>
 
                 <div class="form-divider"></div>
                 <div class="form-section-title"><span>۲</span><div><strong data-i18n="newRegimen">رژیم جایگزین</strong><small data-i18n="selectTarget">انسولین و رویکرد محاسبه را انتخاب کنید</small></div></div>
                 <div class="field-grid">
                   <label class="field"><span data-i18n="targetInsulin">درمان مقصد</span><select id="targetInsulin" required></select></label>
-                  <label class="field"><span data-i18n="safetyApproach">رویکرد محاسبه</span><select id="strategy"><option value="1" data-i18n="oneToOne">معادل ۱:۱</option><option value="0.8" data-i18n="reduceTwenty">کاهش احتیاطی ۲۰٪</option></select><small data-i18n="strategyHelp">انتخاب ضریب باید بر مبنای منبع معتبر و شرایط بیمار باشد.</small></label>
+                  <label class="field" id="targetFrequencyField" hidden><span data-i18n="targetInjections">تعداد تزریق میکس مقصد</span><select id="targetFrequency"></select><small data-i18n="targetFrequencyHelp">ترکیب بیزال/پرندیال و تقسیم اولیه دوز نمایش داده می‌شود.</small></label>
+                  <label class="field" id="strategyField"><span data-i18n="safetyApproach">رویکرد محاسبه</span><select id="strategy"><option value="1" data-i18n="oneToOne">معادل ۱:۱</option><option value="0.8" data-i18n="reduceTwenty">کاهش احتیاطی ۲۰٪</option></select><small data-i18n="strategyHelp">قواعد اجباری برچسب دارو همیشه بر این انتخاب اولویت دارند.</small></label>
                 </div>
 
                 <div class="form-error" id="formError" role="alert"></div>
@@ -128,13 +130,15 @@
                 <div class="empty-result" id="emptyResult"><div class="result-placeholder">⌁</div><h2 data-i18n="resultWaiting">نتیجه اینجا نمایش داده می‌شود</h2><p data-i18n="resultWaitingText">اطلاعات رژیم فعلی و مقصد را تکمیل کنید.</p></div>
                 <div class="result-content" id="resultContent" hidden>
                   <span class="result-label" data-i18n="estimatedDose">برآورد دوز شروع</span>
-                  <div class="dose-result"><strong id="resultDose">—</strong><span data-i18n="unitsPerDay">واحد در روز</span></div>
+                  <div class="dose-result"><strong id="resultDose">—</strong><span id="resultUnit" data-i18n="unitsPerDay">واحد در روز</span></div>
                   <div class="calculation-line"><span id="calculationText"></span></div>
                   <div id="penResult" class="pen-result" hidden></div>
+                  <div id="compositionResult" class="result-breakdown" hidden><strong>ترکیب بیزال/پرندیال</strong><p id="compositionText"></p></div>
+                  <div id="scheduleResult" class="result-breakdown" hidden><strong>تقسیم اولیه تزریق‌ها</strong><p id="scheduleText"></p></div>
                   <p id="resultNote" class="result-note"></p>
                   <dl class="result-details"><div><dt data-i18n="from">مبدأ</dt><dd id="resultSource"></dd></div><div><dt data-i18n="to">مقصد</dt><dd id="resultTarget"></dd></div><div><dt data-i18n="factor">ضریب</dt><dd id="resultFactor"></dd></div></dl>
                   <div class="clinical-warning"><strong data-i18n="beforeUse">پیش از استفاده بالینی</strong><p data-i18n="beforeUseText">قند خون، سابقه هیپوگلیسمی، عملکرد کلیه و کبد، زمان‌بندی تزریق و اطلاعات رسمی فرآورده را بررسی کنید.</p></div>
-                  <div class="clinical-sources"><strong>منابع قواعد</strong><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12690185/" target="_blank" rel="noopener">ADA Standards of Care 2026، بخش ۹</a><a href="https://www.ema.europa.eu/en/documents/product-information/suliqua-epar-product-information_en.pdf" target="_blank" rel="noopener">Suliqua EU Product Information</a><small>کاهش ۲۰٪ برای رژیم چندتزریقی در این ابزار یک قاعده محافظه‌کارانه است و نباید به‌عنوان تبدیل عمومی و صریح ADA برای همه انسولین‌ها تفسیر شود.</small></div>
+                  <div class="clinical-sources"><strong>منابع قواعد</strong><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12690185/" target="_blank" rel="noopener">ADA Standards of Care 2026، بخش ۹</a><a href="https://www.ema.europa.eu/en/documents/product-information/suliqua-epar-product-information_en.pdf" target="_blank" rel="noopener">Suliqua EU Product Information</a><a href="https://www.accessdata.fda.gov/drugsatfda_docs/label/2022/021081s076lbl.pdf" target="_blank" rel="noopener">Lantus Prescribing Information</a><a href="https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/206538Orig1s017Lbl.pdf" target="_blank" rel="noopener">Toujeo Prescribing Information</a><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7566932/" target="_blank" rel="noopener">Peer-reviewed GLP-1 switching guidance</a><small>ADA 2026 دوز معادل برای سوییچ GLP-1ها یا قاعده عمومی ۲۰٪ برای همه تبدیل‌های انسولین ارائه نمی‌کند. قواعد اختصاصی برچسب دارو جداگانه اعمال شده‌اند.</small></div>
                   <button class="secondary-button" id="resetButton" type="button" data-i18n="newCalculation">محاسبه جدید</button>
                 </div>
               </aside>
