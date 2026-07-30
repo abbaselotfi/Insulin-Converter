@@ -27,6 +27,7 @@ describe("conversion interface", () => {
       .filter((option) => option.value === "soliqua");
     expect(soliquaOptions).toHaveLength(1);
     expect(soliquaOptions[0].textContent).toBe("FRC Soliqua");
+    expect(document.querySelector("#targetInsulin").value).toBe("soliqua");
 
     document.querySelector("#sourceInsulin").value = "glargine-u100";
     document.querySelector("#targetInsulin").value = "soliqua";
@@ -49,16 +50,36 @@ describe("conversion interface", () => {
     expect([...document.querySelectorAll("#targetFrequency option")].map((option) => option.value)).toEqual(["2", "3"]);
   });
 
-  test("replaces insulin dose with weight for a GLP-1 to basal path", () => {
+  test("uses the ICon brand and removes GLP-1 and weight controls", () => {
     const dom = loadApp();
     const document = dom.window.document;
-    document.querySelector("#sourceInsulin").value = "semaglutide-weekly";
-    document.querySelector("#sourceInsulin").dispatchEvent(new dom.window.Event("change"));
-    document.querySelector("#targetInsulin").value = "glargine-u100";
-    document.querySelector("#targetInsulin").dispatchEvent(new dom.window.Event("change"));
+    expect(document.title).toContain("ICon");
+    expect(document.querySelector(".brand strong").textContent).toBe("ICon");
+    expect(document.querySelector("#weightField")).toBeNull();
+    expect(document.body.textContent).not.toContain("GLP-1 / GIP");
+    expect([...document.querySelectorAll("#sourceInsulin option")].some((option) => option.value.includes("semaglutide"))).toBe(false);
+  });
 
-    expect(document.querySelector("#doseField").hidden).toBe(true);
-    expect(document.querySelector("#weightField").hidden).toBe(false);
-    expect(document.querySelector("#weightKg").required).toBe(true);
+  test("filters prandial targets in both directions", () => {
+    const dom = loadApp();
+    const document = dom.window.document;
+
+    document.querySelector("#sourceInsulin").value = "aspart-u100";
+    document.querySelector("#sourceInsulin").dispatchEvent(new dom.window.Event("change"));
+    let targets = [...document.querySelectorAll("#targetInsulin option")].map((option) => option.value);
+    expect(targets).toEqual(expect.arrayContaining(["lispro-u100", "glulisine-u100", "regular-u100"]));
+    expect(targets.some((value) => value.includes("glargine") || value.includes("mix") || value === "soliqua")).toBe(false);
+
+    document.querySelector("#sourceInsulin").value = "glargine-u100";
+    document.querySelector("#sourceInsulin").dispatchEvent(new dom.window.Event("change"));
+    targets = [...document.querySelectorAll("#targetInsulin option")].map((option) => option.value);
+    expect(targets.some((value) => ["aspart-u100", "lispro-u100", "glulisine-u100", "regular-u100"].includes(value))).toBe(false);
+    expect(document.querySelector("#targetInsulin").value).toBe("soliqua");
+
+    document.querySelector("#sourceInsulin").value = "aspart-mix-30";
+    document.querySelector("#sourceInsulin").dispatchEvent(new dom.window.Event("change"));
+    targets = [...document.querySelectorAll("#targetInsulin option")].map((option) => option.value);
+    expect(targets).not.toContain("soliqua");
+    expect(targets.some((value) => ["aspart-u100", "lispro-u100", "glulisine-u100", "regular-u100"].includes(value))).toBe(false);
   });
 });
