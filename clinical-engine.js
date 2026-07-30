@@ -71,7 +71,7 @@
   }
 
   function validateInsulinPath(source, target) {
-    if (target.category === "frc" && source.category !== "basal") throw new Error("SOLIQUA_BASAL_ONLY");
+    if (target.category === "frc" && !["basal", "premix"].includes(source.category)) throw new Error("SOLIQUA_BASAL_ONLY");
     if (source.category === "prandial" && target.category !== "prandial") throw new Error("INSUFFICIENT_REGIMEN");
     if (target.category === "prandial" && source.category !== "prandial") throw new Error("INSUFFICIENT_REGIMEN");
   }
@@ -98,7 +98,10 @@
     if (target.id === "glargine-u300" && ["nph-u100", "detemir-u100"].includes(source.id) && frequency > 1) {
       return { factor: 0.8, reason: "برچسب Toujeo: از NPH یا detemir دوباردرروز با ۸۰٪ مجموع دوز روزانه شروع شود." };
     }
-    if (target.category === "frc" && (source.id === "glargine-u300" || frequency > 1)) {
+    if (target.category === "frc" && source.id === "glargine-u300") {
+      return { factor: 0.8, reason: "اطلاعات رسمی Suliqua: برای گلارژین U-300 یا بازال دوباردرروز، ۲۰٪ از مجموع دوز روزانه کم می‌شود." };
+    }
+    if (target.category === "frc" && source.category === "basal" && frequency > 1) {
       return { factor: 0.8, reason: "اطلاعات رسمی Suliqua: برای گلارژین U-300 یا بازال دوباردرروز، ۲۰٪ از مجموع دوز روزانه کم می‌شود." };
     }
     if (source.category === "basal" && frequency > 1) {
@@ -110,7 +113,7 @@
   function conversionBasis(source, target, dailyDose) {
     if (source.category !== "premix") return { dose: dailyDose, label: "", sourceComposition: null };
     const sourceComposition = compositionFor(source, dailyDose);
-    if (target.category === "basal") {
+    if (["basal", "frc"].includes(target.category)) {
       return {
         dose: dailyDose * source.basalPercent / 100,
         label: ` × ${source.basalPercent}% basal`,
@@ -150,8 +153,11 @@
 
     if (target.category === "frc") {
       const soliqua = selectSoliquaPen(adjustedDose);
-      const offLabelFrequency = frequency > 2
+      const offLabelFrequency = source.category === "basal" && frequency > 2
         ? " رژیم بازال سه‌باردرروز در جدول رسمی Suliqua ذکر نشده است؛ کاهش ۲۰٪ در این مسیر محافظه‌کارانه است و نیاز به بازبینی متخصص دارد."
+        : "";
+      const premixContext = source.category === "premix"
+        ? ` از مجموع دوز میکس، سهم بیزال ${basis.sourceComposition.basalPercent}٪ به‌عنوان مبنای محاسبه استخراج شد. شواهد بالینی از امکان switch میکس به iGlarLixi پشتیبانی می‌کنند، اما جدول شروع رسمی Suliqua دوز عددی اختصاصی برای premix ارائه نمی‌کند؛ بازبینی متخصص لازم است.`
         : "";
       return Object.freeze({
         source,
@@ -163,8 +169,9 @@
         estimatedDose: soliqua.startingDose,
         formula: `${dose}${basis.label} × ${finalFactor} → ${soliqua.startingDose} dose steps`,
         soliqua,
-        note: `${rule.reason} دوز بازال مبنا پس از تعدیل ${adjustedDose} واحد است؛ شروع قلم ${soliqua.pen} روی ${soliqua.startingDose} dose-step قفل می‌شود و از سقف شروع ${soliqua.maxStartingDose} بالاتر نمی‌رود.${offLabelFrequency}`,
-        evidence: ["suliqua-ema"]
+        sourceComposition: basis.sourceComposition,
+        note: `${rule.reason} دوز بازال مبنا پس از تعدیل ${adjustedDose} واحد است؛ شروع قلم ${soliqua.pen} روی ${soliqua.startingDose} dose-step قفل می‌شود و از سقف شروع ${soliqua.maxStartingDose} بالاتر نمی‌رود.${premixContext}${offLabelFrequency}`,
+        evidence: source.category === "premix" ? ["suliqua-ema", "premix-iglarlixi-switch"] : ["suliqua-ema"]
       });
     }
 

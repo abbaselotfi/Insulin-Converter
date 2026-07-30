@@ -79,7 +79,21 @@ describe("conversion interface", () => {
     document.querySelector("#sourceInsulin").value = "aspart-mix-30";
     document.querySelector("#sourceInsulin").dispatchEvent(new dom.window.Event("change"));
     targets = [...document.querySelectorAll("#targetInsulin option")].map((option) => option.value);
-    expect(targets).not.toContain("soliqua");
+    expect(targets).toContain("soliqua");
+    expect(document.querySelector("#targetInsulin").value).toBe("soliqua");
     expect(targets.some((value) => ["aspart-u100", "lispro-u100", "glulisine-u100", "regular-u100"].includes(value))).toBe(false);
+  });
+
+  test("keeps the English start button readable and mirrors only directional arrows", () => {
+    const dom = loadApp();
+    const document = dom.window.document;
+
+    document.querySelector("#languageToggle").click();
+
+    const startLabel = document.querySelector("[data-i18n='startConversion']");
+    expect(startLabel.textContent).toBe("Start insulin conversion");
+    expect(startLabel.classList.contains("direction-arrow")).toBe(false);
+    expect(document.documentElement.dir).toBe("ltr");
+    expect(document.querySelectorAll(".direction-arrow")).toHaveLength(2);
   });
 });

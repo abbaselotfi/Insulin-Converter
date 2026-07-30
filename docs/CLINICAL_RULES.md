@@ -69,8 +69,11 @@ by 20% before the table is applied. The 100/50 pen is never started above 20 dos
 100/33 pen is never started above 30 dose steps. These caps limit the initial lixisenatide dose
 to 10 micrograms or less.
 
-Automatic premix-to-Soliqua conversion is not offered because it is not specified in the
-product initiation table.
+Premix-to-Soliqua is offered by extracting the labelled basal percentage of the source
+premix and using that basal component to select the pen and capped starting dose. Clinical
+switch studies support moving from premixed insulin to iGlarLixi, but the official Suliqua
+initiation table does not provide a dedicated numerical premix conversion. The result
+therefore labels this calculation as an extrapolation that requires specialist review.
 
 ## Primary references
 
@@ -79,3 +82,4 @@ product initiation table.
 - [Lantus Prescribing Information](https://www.accessdata.fda.gov/drugsatfda_docs/label/2022/021081s076lbl.pdf)
 - [Toujeo Prescribing Information](https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/206538Orig1s017Lbl.pdf)
 - [2025 Guide to Therapeutic Interchange of Insulin Products](https://www.cardi-oh.org/files/resources/cardi-oh-guide-to-therapeutic-interchange-of-insulin-products-for-safe-and-effective-transitions-in-diabetes-management.pdf)
+- [Switching from premixed insulin to iGlarLixi: efficacy and safety study](https://pmc.ncbi.nlm.nih.gov/articles/PMC11965013/)

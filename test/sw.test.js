@@ -12,7 +12,7 @@
 const path = require("path");
 
 const SW = path.join(__dirname, "..", "sw.js");
-const CACHE_NAME = "icon-v4";
+const CACHE_NAME = "icon-v5";
 const CORE_ASSETS = [
   "./",
   "./index.html",
