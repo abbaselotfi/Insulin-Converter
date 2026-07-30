@@ -2,3 +2,4 @@
 .pen-result{margin:12px 0;padding:12px 16px;border-radius:12px;background:#f7f8f6;font-weight:800}.pen-peach{color:#d56f4a;border-inline-start:5px solid #efaa8d}.pen-olive{color:#68752d;border-inline-start:5px solid #89964a}.result-note{line-height:1.8;color:#52606d;font-size:.9rem}
 .clinical-sources{display:grid;gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid #dce6e4;font-size:.82rem}.clinical-sources a{color:#0c766e}.clinical-sources small{line-height:1.7;color:#68747d}
 .result-breakdown{margin:10px 0;padding:11px 13px;border:1px solid #dce8e6;border-radius:9px;background:#f8fbfa}.result-breakdown strong{display:block;color:#315f5b;font-size:10px}.result-breakdown p{margin:5px 0 0;color:#526d6b;font-size:10px;line-height:1.75}.calculation-line{white-space:normal;line-height:1.8}.dose-result{flex-wrap:wrap}.dose-result strong{overflow-wrap:anywhere}
+.tool-grid{grid-template-columns:minmax(0,420px)}
