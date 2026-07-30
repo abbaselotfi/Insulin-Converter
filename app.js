@@ -25,7 +25,7 @@ const translations = {
     newCalculation: "محاسبه جدید", invalidDose: "ورودی‌ها معتبر نیستند یا این تبدیل به اطلاعات بیشتری نیاز دارد.",
     sameInsulin: "انسولین مبدأ و مقصد باید متفاوت باشند.",
     soliquaRange: "دوز بازال تعدیل‌شده خارج از بازه تأییدشده شروع Suliqua است و نیاز به بازبینی دستی دارد.",
-    soliquaBasalOnly: "تبدیل خودکار مستقیم به FRC Soliqua فقط از انسولین بیزال پشتیبانی می‌شود.",
+    soliquaBasalOnly: "تبدیل به FRC Soliqua فقط از انسولین بیزال یا سهم بیزال انسولین میکس پشتیبانی می‌شود.",
     insufficientRegimen: "تبدیل خودکار بین پرندیال و بیزال/میکس مجاز نیست؛ اطلاعات رژیم کامل لازم است."
   },
   en: {
@@ -54,7 +54,7 @@ const translations = {
     newCalculation: "New calculation", invalidDose: "Inputs are invalid or this path needs more clinical information.",
     sameInsulin: "Current and target insulin must be different.",
     soliquaRange: "The adjusted basal dose is outside the approved Suliqua initiation range and requires manual review.",
-    soliquaBasalOnly: "Automatic FRC Soliqua conversion is supported only from basal insulin.",
+    soliquaBasalOnly: "FRC Soliqua conversion is supported only from basal insulin or the basal component of premixed insulin.",
     insufficientRegimen: "Automatic conversion between prandial and basal/premix insulin is not supported; a complete regimen is required."
   }
 };
@@ -87,7 +87,6 @@ function compatibleTargets(source) {
     if (target.id === source.id) return false;
     if (source.category === "prandial") return target.category === "prandial";
     if (target.category === "prandial") return false;
-    if (source.category === "premix" && target.category === "frc") return false;
     return true;
   });
 }
