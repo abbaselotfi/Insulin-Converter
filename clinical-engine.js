@@ -3,7 +3,7 @@
   if (typeof module === "object" && module.exports) module.exports = api;
   root.ClinicalEngine = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
-  const INSULINS = Object.freeze([
+  const ALL_INSULINS = Object.freeze([
     { id: "glargine-u100", generic: "Insulin glargine U-100", brand: "Lantus", category: "basal", frequencies: [1, 2, 3] },
     { id: "glargine-u300", generic: "Insulin glargine U-300", brand: "Toujeo", category: "basal", frequencies: [1] },
     { id: "degludec-u100", generic: "Insulin degludec U-100", brand: "Tresiba", category: "basal", frequencies: [1] },
@@ -27,10 +27,13 @@
     { id: "liraglutide-daily", generic: "Liraglutide", brand: "Victoza", category: "glp1", interval: "daily" },
     { id: "lixisenatide-daily", generic: "Lixisenatide", brand: "Lyxumia/Adlyxin", category: "glp1", interval: "daily" }
   ]);
-  const THERAPIES = Object.freeze([...INSULINS, ...GLP1]);
+  // Keep the original public INSULINS contract as the five-item basal catalog.
+  // Expanded insulin categories are available through ALL_INSULINS/THERAPIES.
+  const INSULINS = Object.freeze(ALL_INSULINS.filter((item) => item.category === "basal"));
+  const THERAPIES = Object.freeze([...ALL_INSULINS, ...GLP1]);
 
   function getTherapy(id) { return THERAPIES.find((item) => item.id === id); }
-  function getInsulin(id) { return INSULINS.find((item) => item.id === id); }
+  function getInsulin(id) { return ALL_INSULINS.find((item) => item.id === id); }
   function reductionForFrequency(frequency) { return Number(frequency) > 1 ? 0.8 : 1; }
 
   function selectSoliquaPen(basalDose) {
@@ -77,5 +80,5 @@
       note: frequencyFactor === 0.8 ? "به‌دلیل رژیم مبدأ چندتزریقی، کاهش احتیاطی ۲۰٪ بر مجموع دوز روزانه اعمال شد." : "برآورد اولیه؛ تیتراسیون بر اساس پایش قند خون لازم است." });
   }
 
-  return Object.freeze({ INSULINS, GLP1, THERAPIES, getInsulin, getTherapy, reductionForFrequency, selectSoliquaPen, calculateConversion });
+  return Object.freeze({ INSULINS, ALL_INSULINS, GLP1, THERAPIES, getInsulin, getTherapy, reductionForFrequency, selectSoliquaPen, calculateConversion });
 });
