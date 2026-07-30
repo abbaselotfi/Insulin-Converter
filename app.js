@@ -1,23 +1,20 @@
 const translations = {
   fa: {
-    skip: "پرش به محتوای اصلی", clinicalPlatform: "پلتفرم بالینی", dashboard: "داشبورد", insulinConverter: "تبدیل انسولین",
-    patients: "بیماران", medications: "داروها", soon: "به‌زودی", prototype: "نسخه آزمایشی", notForPrescription: "برای تجویز مستقل نیست",
-    workspace: "فضای کار بالینی", todayFocus: "ابزارهای تصمیم‌یار برای ویزیت امروز", clinicalWorkspace: "Clinical workspace",
-    welcome: "سلام دکتر، آماده‌اید؟", welcomeText: "ابزارهای مورد نیاز برای تصمیم‌گیری سریع‌تر و مستندتر را از اینجا در دسترس دارید.",
+    skip: "پرش به محتوای اصلی", clinicalPlatform: "تبدیل بالینی انسولین", dashboard: "داشبورد", insulinConverter: "تبدیل انسولین",
+    prototype: "نسخه آزمایشی", notForPrescription: "برای تجویز مستقل نیست", workspace: "فضای کار بالینی",
+    todayFocus: "ابزار تبدیل انسولین برای ویزیت امروز", clinicalWorkspace: "Insulin conversion workspace",
+    welcome: "سلام دکتر، آماده‌اید؟", welcomeText: "قواعد تبدیل انسولین را با محاسبه شفاف، منبع و هشدار بالینی بررسی کنید.",
     startConversion: "شروع تبدیل انسولین", safetyTitle: "تصمیم نهایی با پزشک است",
     safetyText: "خروجی‌های این نسخه، برآورد محاسباتی هستند و باید با وضعیت بیمار، قند خون و منابع تأییدشده تطبیق داده شوند.",
-    clinicalTools: "ابزارهای بالینی", clinicalToolsText: "ماژول‌های نسخه نخست پلتفرم", available: "فعال",
-    converterDescription: "برآورد شفاف دوز هنگام تغییر بین انسولین‌ها و FRC، همراه با نمایش ضریب و هشدار ایمنی.",
-    openTool: "باز کردن ابزار", glpDescription: "مقایسه داروها، دوزها و ملاحظات ایمنی در یک نمای واحد.",
-    treatmentPath: "مسیر درمان", pathDescription: "مسیر تصمیم‌گیری نسخه‌پذیر بر اساس بیماری‌های همراه و اهداف فردی.",
-    contentStatus: "وضعیت محتوای بالینی", contentStatusText: "قواعد نسخه آزمایشی؛ در انتظار بازبینی و تأیید کمیته علمی",
-    calculator: "Calculator", backDashboard: "بازگشت به داشبورد",
-    converterIntro: "تبدیل بیزال، میکس، پرندیال، FRC و راهنمای سوییچ GLP-1 را بر اساس مسیر درمان بررسی کنید.",
-    currentRegimen: "رژیم فعلی", requiredFields: "فیلدهای مرتبط با مسیر انتخابی الزامی هستند", currentInsulin: "درمان فعلی",
+    clinicalTools: "ابزار فعال", clinicalToolsText: "نسخه فعلی فقط بر تبدیل انسولین تمرکز دارد.", available: "فعال",
+    converterDescription: "تبدیل بیزال، میکس، پرندیال و FRC همراه با قواعد اختصاصی فرآورده و هشدارهای ایمنی.",
+    openTool: "باز کردن ابزار", contentStatus: "وضعیت محتوای بالینی",
+    contentStatusText: "قواعد نسخه آزمایشی؛ در انتظار بازبینی و تأیید کمیته علمی", calculator: "Calculator",
+    backDashboard: "بازگشت به داشبورد", converterIntro: "تبدیل انسولین‌های بیزال، میکس، پرندیال و FRC را بر اساس مسیر معتبر بررسی کنید.",
+    currentRegimen: "رژیم فعلی", requiredFields: "تمام فیلدهای مرتبط الزامی هستند", currentInsulin: "انسولین فعلی",
     dailyDose: "دوز کل روزانه", units: "واحد", doseHelp: "مجموع واحد تزریق‌شده طی ۲۴ ساعت",
     injectionsPerDay: "تعداد تزریق در روز", frequencyHelp: "دوز ورودی باید مجموع تمام تزریق‌های ۲۴ ساعت باشد.",
-    weight: "وزن بیمار", weightHelp: "برای محاسبه بازه شروع بازال از GLP-1 لازم است.", newRegimen: "رژیم جایگزین",
-    selectTarget: "درمان مقصد و رویکرد محاسبه را انتخاب کنید", targetInsulin: "درمان مقصد",
+    newRegimen: "رژیم جایگزین", selectTarget: "انسولین مقصد و رویکرد محاسبه را انتخاب کنید", targetInsulin: "انسولین مقصد",
     targetInjections: "تعداد تزریق میکس مقصد", targetFrequencyHelp: "ترکیب بیزال/پرندیال و تقسیم اولیه دوز نمایش داده می‌شود.",
     safetyApproach: "رویکرد محاسبه", oneToOne: "معادل ۱:۱", reduceTwenty: "کاهش احتیاطی ۲۰٪",
     strategyHelp: "قواعد اجباری برچسب دارو همیشه بر این انتخاب اولویت دارند.", calculate: "محاسبه برآورد",
@@ -26,28 +23,27 @@ const translations = {
     beforeUse: "پیش از استفاده بالینی",
     beforeUseText: "قند خون، سابقه هیپوگلیسمی، عملکرد کلیه و کبد، زمان‌بندی تزریق و اطلاعات رسمی فرآورده را بررسی کنید.",
     newCalculation: "محاسبه جدید", invalidDose: "ورودی‌ها معتبر نیستند یا این تبدیل به اطلاعات بیشتری نیاز دارد.",
-    sameInsulin: "درمان مبدأ و مقصد باید متفاوت باشند.", weightRequired: "برای این مسیر وزن معتبر بین ۳۰ تا ۳۰۰ کیلوگرم وارد کنید.",
-    soliquaRange: "دوز بازال تعدیل‌شده خارج از بازه تأییدشده شروع Suliqua (حداکثر ۶۰ واحد) است و نیاز به بازبینی دستی دارد.",
-    soliquaBasalOnly: "تبدیل خودکار مستقیم به FRC Soliqua فقط از بازال یا GLP-1 پشتیبانی می‌شود.",
-    insufficientRegimen: "برای تبدیل بین بیزال و پرندیال، اطلاعات رژیم کامل لازم است؛ این ابزار از تبدیل واحدبه‌واحد ناایمن خودداری می‌کند."
+    sameInsulin: "انسولین مبدأ و مقصد باید متفاوت باشند.",
+    soliquaRange: "دوز بازال تعدیل‌شده خارج از بازه تأییدشده شروع Suliqua است و نیاز به بازبینی دستی دارد.",
+    soliquaBasalOnly: "تبدیل خودکار مستقیم به FRC Soliqua فقط از انسولین بیزال پشتیبانی می‌شود.",
+    insufficientRegimen: "تبدیل خودکار بین پرندیال و بیزال/میکس مجاز نیست؛ اطلاعات رژیم کامل لازم است."
   },
   en: {
-    skip: "Skip to main content", clinicalPlatform: "Clinical platform", dashboard: "Dashboard", insulinConverter: "Insulin converter",
-    patients: "Patients", medications: "Medications", soon: "Coming soon", prototype: "Prototype", notForPrescription: "Not for autonomous prescribing",
-    workspace: "Clinical workspace", todayFocus: "Decision-support tools for today's visit", clinicalWorkspace: "Clinical workspace",
-    welcome: "Welcome, Doctor", welcomeText: "Access focused tools for faster, more traceable clinical decisions.", startConversion: "Start insulin conversion",
-    safetyTitle: "The clinician makes the final decision", safetyText: "Outputs are estimates and must be reconciled with patient status, glucose data, and approved sources.",
-    clinicalTools: "Clinical tools", clinicalToolsText: "Modules in the first platform release", available: "Available",
-    converterDescription: "Transparent insulin and FRC switching estimates with factors and safety cautions.", openTool: "Open tool",
-    glpDescription: "Compare medications, doses, and safety considerations in one view.", treatmentPath: "Treatment pathway",
-    pathDescription: "Versioned decision pathways informed by comorbidities and individual goals.", contentStatus: "Clinical content status",
-    contentStatusText: "Prototype rules; pending scientific committee review and approval", calculator: "Calculator", backDashboard: "Back to dashboard",
-    converterIntro: "Review basal, premix, prandial, FRC, and GLP-1 switching paths.", currentRegimen: "Current regimen",
-    requiredFields: "Fields relevant to the selected path are required", currentInsulin: "Current therapy", dailyDose: "Total daily dose",
+    skip: "Skip to main content", clinicalPlatform: "Clinical insulin conversion", dashboard: "Dashboard", insulinConverter: "Insulin converter",
+    prototype: "Prototype", notForPrescription: "Not for autonomous prescribing", workspace: "Clinical workspace",
+    todayFocus: "Insulin conversion for today's visit", clinicalWorkspace: "Insulin conversion workspace",
+    welcome: "Welcome, Doctor", welcomeText: "Review insulin conversion rules with transparent calculations, sources, and safety cautions.",
+    startConversion: "Start insulin conversion", safetyTitle: "The clinician makes the final decision",
+    safetyText: "Outputs are estimates and must be reconciled with patient status, glucose data, and approved sources.",
+    clinicalTools: "Active tool", clinicalToolsText: "The current release focuses only on insulin conversion.", available: "Available",
+    converterDescription: "Basal, premix, prandial, and FRC conversion with product-specific rules and safety cautions.", openTool: "Open tool",
+    contentStatus: "Clinical content status", contentStatusText: "Prototype rules; pending scientific committee review and approval",
+    calculator: "Calculator", backDashboard: "Back to dashboard",
+    converterIntro: "Review validated basal, premix, prandial, and FRC insulin conversion paths.", currentRegimen: "Current regimen",
+    requiredFields: "All relevant fields are required", currentInsulin: "Current insulin", dailyDose: "Total daily dose",
     units: "units", doseHelp: "Total units administered over 24 hours", injectionsPerDay: "Injections per day",
-    frequencyHelp: "Enter the sum of all injections over 24 hours.", weight: "Patient weight",
-    weightHelp: "Required to calculate a basal initiation range after GLP-1.", newRegimen: "Replacement regimen",
-    selectTarget: "Select the target therapy and calculation approach", targetInsulin: "Target therapy",
+    frequencyHelp: "Enter the sum of all injections over 24 hours.", newRegimen: "Replacement regimen",
+    selectTarget: "Select the target insulin and calculation approach", targetInsulin: "Target insulin",
     targetInjections: "Target premix injections", targetFrequencyHelp: "The basal/prandial composition and initial dose split will be shown.",
     safetyApproach: "Calculation approach", oneToOne: "1:1 equivalent", reduceTwenty: "20% precautionary reduction",
     strategyHelp: "Mandatory product-label rules override this selection.", calculate: "Calculate estimate",
@@ -56,14 +52,14 @@ const translations = {
     beforeUse: "Before clinical use",
     beforeUseText: "Review glucose data, hypoglycemia history, kidney and liver function, injection timing, and approved product information.",
     newCalculation: "New calculation", invalidDose: "Inputs are invalid or this path needs more clinical information.",
-    sameInsulin: "Current and target therapy must be different.", weightRequired: "Enter a valid weight between 30 and 300 kg.",
+    sameInsulin: "Current and target insulin must be different.",
     soliquaRange: "The adjusted basal dose is outside the approved Suliqua initiation range and requires manual review.",
-    soliquaBasalOnly: "Automatic FRC Soliqua conversion is supported only from basal insulin or GLP-1 therapy.",
-    insufficientRegimen: "A complete regimen is required for basal-to-prandial conversion; no unsafe unit-for-unit estimate was produced."
+    soliquaBasalOnly: "Automatic FRC Soliqua conversion is supported only from basal insulin.",
+    insufficientRegimen: "Automatic conversion between prandial and basal/premix insulin is not supported; a complete regimen is required."
   }
 };
 
-let language = localStorage.getItem("diabeto-language") || "fa";
+let language = localStorage.getItem("icon-language") || localStorage.getItem("diabeto-language") || "fa";
 const $ = (selector) => document.querySelector(selector);
 
 function therapyLabel(therapy) {
@@ -72,8 +68,8 @@ function therapyLabel(therapy) {
 
 function categoryLabels() {
   return language === "fa"
-    ? { basal: "انسولین‌های بیزال", premix: "انسولین‌های میکس", prandial: "انسولین‌های پرندیال", frc: "FRC", glp1: "GLP-1 / GIP-GLP-1" }
-    : { basal: "Basal insulins", premix: "Premixed insulins", prandial: "Prandial insulins", frc: "FRC", glp1: "GLP-1 / GIP-GLP-1" };
+    ? { basal: "انسولین‌های بیزال", premix: "انسولین‌های میکس", prandial: "انسولین‌های پرندیال", frc: "FRC" }
+    : { basal: "Basal insulins", premix: "Premixed insulins", prandial: "Prandial insulins", frc: "FRC" };
 }
 
 function therapyOptions(items) {
@@ -86,13 +82,31 @@ function therapyOptions(items) {
   }).join("");
 }
 
+function compatibleTargets(source) {
+  return ClinicalEngine.THERAPIES.filter((target) => {
+    if (target.id === source.id) return false;
+    if (source.category === "prandial") return target.category === "prandial";
+    if (target.category === "prandial") return false;
+    if (source.category === "premix" && target.category === "frc") return false;
+    return true;
+  });
+}
+
+function populateTargetOptions(preferredTarget = "soliqua") {
+  const source = ClinicalEngine.getTherapy($("#sourceInsulin").value);
+  const targets = compatibleTargets(source);
+  $("#targetInsulin").innerHTML = therapyOptions(targets);
+  $("#targetInsulin").value = targets.some((item) => item.id === preferredTarget)
+    ? preferredTarget
+    : targets[0]?.id || "";
+}
+
 function populateTherapies() {
-  const sourceValue = $("#sourceInsulin").value;
-  const targetValue = $("#targetInsulin").value;
+  const sourceValue = $("#sourceInsulin").value || "glargine-u100";
+  const targetValue = $("#targetInsulin").value || "soliqua";
   $("#sourceInsulin").innerHTML = therapyOptions(ClinicalEngine.THERAPIES.filter((item) => !item.targetOnly));
-  $("#targetInsulin").innerHTML = therapyOptions(ClinicalEngine.THERAPIES);
-  $("#sourceInsulin").value = sourceValue || "glargine-u100";
-  $("#targetInsulin").value = targetValue || "degludec-u100";
+  $("#sourceInsulin").value = ClinicalEngine.getTherapy(sourceValue) ? sourceValue : "glargine-u100";
+  populateTargetOptions(targetValue);
   updateDynamicFields();
 }
 
@@ -101,20 +115,14 @@ function updateDynamicFields() {
   const target = ClinicalEngine.getTherapy($("#targetInsulin").value);
   const sourceFrequencies = source?.frequencies || [1];
   const targetFrequencies = target?.targetFrequencies || target?.frequencies || [1];
-  const sourceIsGlp = source?.category === "glp1";
-  const glpToBasal = sourceIsGlp && target?.category === "basal";
-  const showStrategy = !sourceIsGlp && target?.category !== "glp1" && target?.category !== "frc";
 
-  $("#doseField").hidden = sourceIsGlp;
-  $("#currentDose").required = !sourceIsGlp;
-  $("#frequencyField").hidden = sourceIsGlp || sourceFrequencies.length === 1;
+  $("#frequencyField").hidden = sourceFrequencies.length === 1;
   $("#sourceFrequency").innerHTML = sourceFrequencies.map((value) => `<option value="${value}">${value} ${language === "fa" ? "بار در روز" : "times daily"}</option>`).join("");
-  $("#weightField").hidden = !glpToBasal;
-  $("#weightKg").required = glpToBasal;
   $("#targetFrequencyField").hidden = target?.category !== "premix";
   $("#targetFrequency").innerHTML = targetFrequencies.map((value) => `<option value="${value}">${value} ${language === "fa" ? "بار در روز" : "times daily"}</option>`).join("");
-  $("#strategyField").hidden = !showStrategy;
-  if (!showStrategy) $("#strategy").value = "1";
+  const hideStrategy = target?.category === "frc" || source?.category === "prandial";
+  $("#strategyField").hidden = hideStrategy;
+  if (hideStrategy) $("#strategy").value = "1";
 }
 
 function applyLanguage(nextLanguage) {
@@ -122,14 +130,14 @@ function applyLanguage(nextLanguage) {
   const isFa = language === "fa";
   document.documentElement.lang = language;
   document.documentElement.dir = isFa ? "rtl" : "ltr";
-  document.title = isFa ? "Diabeto | دستیار بالینی دیابت" : "Diabeto | Clinical diabetes assistant";
+  document.title = isFa ? "ICon | تبدیل بالینی انسولین" : "ICon | Clinical insulin conversion";
   document.querySelectorAll("[data-i18n]").forEach((element) => {
     const value = translations[language][element.dataset.i18n];
     if (value) element.textContent = value;
   });
   $(".language-current").textContent = isFa ? "فا" : "EN";
   $("#languageToggle > span:last-child").textContent = isFa ? "EN" : "فا";
-  localStorage.setItem("diabeto-language", language);
+  localStorage.setItem("icon-language", language);
   populateTherapies();
 }
 
@@ -150,7 +158,6 @@ function closeMenu() {
 function showError(errorCode) {
   const keyByCode = {
     SAME_INSULIN: "sameInsulin",
-    WEIGHT_REQUIRED: "weightRequired",
     SOLIQUA_RANGE: "soliquaRange",
     SOLIQUA_BASAL_ONLY: "soliquaBasalOnly",
     INSUFFICIENT_REGIMEN: "insufficientRegimen"
@@ -163,6 +170,8 @@ function showError(errorCode) {
 function resetResult() {
   $("#conversionForm").reset();
   populateTherapies();
+  populateTargetOptions("soliqua");
+  updateDynamicFields();
   $("#resultContent").hidden = true;
   $("#emptyResult").hidden = false;
   $("#formError").classList.remove("visible");
@@ -187,11 +196,9 @@ function renderSchedule(result) {
 }
 
 function renderResult(result) {
-  $("#resultDose").textContent = result.resultLabel || (result.estimatedDose ?? "—");
-  $("#resultUnit").textContent = result.resultLabel
-    ? ""
-    : result.soliqua ? "dose-step در روز" : translations[language].unitsPerDay;
-  $("#calculationText").textContent = result.guidance || result.formula || "";
+  $("#resultDose").textContent = result.estimatedDose ?? "—";
+  $("#resultUnit").textContent = result.soliqua ? "dose-step در روز" : translations[language].unitsPerDay;
+  $("#calculationText").textContent = result.formula || "";
   $("#resultSource").textContent = therapyLabel(result.source);
   $("#resultTarget").textContent = therapyLabel(result.target);
   $("#resultFactor").textContent = Number.isFinite(result.factor) ? `× ${result.factor}` : "—";
@@ -220,22 +227,23 @@ $("#menuButton").addEventListener("click", () => {
 });
 $("#sidebarOverlay").addEventListener("click", closeMenu);
 $("#resetButton").addEventListener("click", resetResult);
-$("#sourceInsulin").addEventListener("change", updateDynamicFields);
+$("#sourceInsulin").addEventListener("change", () => {
+  populateTargetOptions("soliqua");
+  updateDynamicFields();
+});
 $("#targetInsulin").addEventListener("change", updateDynamicFields);
 $("#conversionForm").addEventListener("submit", (event) => {
   event.preventDefault();
   $("#formError").classList.remove("visible");
   try {
-    const result = ClinicalEngine.calculateConversion({
+    renderResult(ClinicalEngine.calculateConversion({
       sourceId: $("#sourceInsulin").value,
       targetId: $("#targetInsulin").value,
       dailyDose: $("#currentDose").value,
       factor: $("#strategy").value,
       sourceFrequency: $("#sourceFrequency").value || 1,
-      targetFrequency: $("#targetFrequency").value || 1,
-      weightKg: $("#weightKg").value
-    });
-    renderResult(result);
+      targetFrequency: $("#targetFrequency").value || 1
+    }));
   } catch (error) {
     showError(error.message);
   }
