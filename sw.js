@@ -1,13 +1,13 @@
-const cacheName = 'insulin-pwa-v1';
+const cacheName = 'diabeto-v2';
 const assets = [
-  '/',
-  'index.html',
-  'insulin-logic.js',
-  'pwa-handler.js',
-  'soliqua.html',
-  'manifest.json',
-  'icon-192.png',
-  'icon-512.png'
+  './',
+  './index.html',
+  './styles.css',
+  './app.js',
+  './clinical-engine.js',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', evt => {
@@ -18,10 +18,20 @@ self.addEventListener('install', evt => {
   );
 });
 
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys => Promise.all(keys.filter(key => key !== cacheName).map(key => caches.delete(key))))
+  );
+});
+
 self.addEventListener('fetch', evt => {
   evt.respondWith(
     caches.match(evt.request).then(cacheRes => {
-      return cacheRes || fetch(evt.request);
+      return cacheRes || fetch(evt.request).then(response => {
+        const copy = response.clone();
+        caches.open(cacheName).then(cache => cache.put(evt.request, copy));
+        return response;
+      });
     })
   );
 });

@@ -1,1 +1,148 @@
-<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>سامانه پیشرفته تبدیل و محاسبه دوز انسولین</title><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0056b3"><link class="apple-touch-icon" href="icon-192.png"><style>body{font-family:'Tahoma','Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#eef2f7;color:#333;margin:0;padding:20px;display:flex;justify-content:center;align-items:center;min-height:100vh}.container{background-color:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.12);padding:28px;width:100%;max-width:500px}.soliqua-nav-btn{display:block;text-align:center;background-color:#00a86b;color:#fff;text-decoration:none;padding:12px;border-radius:8px;font-weight:700;font-size:14px;margin-bottom:20px;box-shadow:0 4px 12px rgba(0,168,107,.2);transition:background .3s}.soliqua-nav-btn:hover{background-color:#00875a}h2{color:#0056b3;text-align:center;margin-bottom:20px;font-size:22px;border-bottom:2px solid #0056b3;padding-bottom:12px}.form-group{margin-bottom:18px}label{display:block;margin-bottom:6px;font-weight:700;font-size:14px;color:#333}select,input{width:100%;padding:12px;border:1px solid #b0c4de;border-radius:8px;box-sizing:border-box;font-size:14px;font-family:inherit;background-color:#fcfdfd}select:focus,input:focus{border-color:#0056b3;outline:none;box-shadow:0 0 6px rgba(0,86,179,.3)}button{background-color:#007bff;color:#fff;border:none;padding:14px;width:100%;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;transition:background .3s,transform .1s;margin-top:10px}button:hover{background-color:#0056b3}.result-box{margin-top:24px;background-color:#e6f2ff;border-right:4px solid #0056b3;padding:18px;border-radius:0 8px 8px 0;display:none}.result-title{font-weight:700;color:#004085;margin-bottom:8px;font-size:16px}.alert-text{margin-top:16px;font-size:13px;line-height:1.4;color:#721c24;background-color:#f8d7da;padding:12px;border-radius:6px;border-left:4px solid #f5c6cb;display:none}</style></head><body><div class="container"><a href="./soliqua.html" class="soliqua-nav-btn">📘 راهنمای بالینی و ویژگی‌های قلم انسولین سولیکوآ Soliqua</a><h2>سامانه کلینیکال تبدیل انسولین</h2><div class="form-group"><label for="insFrom">انسولین جاری (مبدأ):</label><select id="insFrom" onchange="updateRegimen()"><optgroup label="انسولین‌های ترکیبی مدرن (FRC)"><option value="soliqua_50">سولیکوآ ۱۰۰/۵۰ (قلم زرد/هلویی)</option><option value="soliqua_33">سولیکوآ ۱۰۰/۳۳ (قلم زیتونی)</option></optgroup><optgroup label="انسولین‌های پایه (Basal)"><option value="lantus" selected>لانتوس (Glargine U-100)</option><option value="toujeo">توژئو (Glargine U-300)</option><option value="tresiba">دگلودک (Tresiba)</option><option value="levemir">لِومیر (Detemir)</option><option value="nph_basal">ان‌پی‌اچ (NPH)</option></optgroup><optgroup label="انسولین‌های مخلوط (Premixed)"><option value="novomix">نوومیکس ۳۰ (NovoMix)</option><option value="humalog_mix_25">هومالوگ میکس ۲۵ (Humalog Mix 25)</option><option value="humalog_mix_50">هومالوگ میکس ۵۰ (Humalog Mix 50)</option><option value="ryzodeg">رایزودگ (Ryzodeg)</option><option value="human_mix">مخلوط انسانی ۷۰/۳۰ (Human Mix)</option></optgroup><optgroup label="انسولین‌های سریع‌الاثر (Bolus)"><option value="apidra_novorapid">آنالوگ سریع (NovoRapid / Apidra)</option><option value="regular">رگولار انسانی (Regular)</option></optgroup></select></div><div class="form-group" id="freqFromBox" style="display:none"><label for="freqFrom">⏱️ فرکانس تزریق انسولین مبدأ:</label><select id="freqFrom" onchange="updateRegimen()"><option value="1">۱ بار در روز (QD)</option><option value="2">۲ بار در روز (BID)</option><option value="3">۳ بار در روز (TID)</option></select></div><div class="form-group"><label for="insTo">انسولین جایگزین (مقصد):</label><select id="insTo" onchange="updateRegimen()"><optgroup label="انسولین‌های ترکیبی مدرن (FRC)"><option value="soliqua_combined">Soliqua 100/50 یا Soliqua 100/33</option></optgroup><optgroup label="انسولین‌های پایه (Basal)"><option value="lantus">لانتوس (Glargine U-100)</option><option value="toujeo">توژئو (Glargine U-300)</option><option value="tresiba">دگلودک (Tresiba)</option><option value="levemir">لِومیر (Detemir)</option><option value="nph_basal">ان‌پی‌اچ (NPH)</option></optgroup><optgroup label="انسولین‌های مخلوط (Premixed)"><option value="novomix">نوومیکس ۳۰ (NovoMix)</option><option value="humalog_mix_25">هومالوگ میکس ۲۵ (Humalog Mix 25)</option><option value="humalog_mix_50">هومالوگ میکس ۵۰ (Humalog Mix 50)</option><option value="ryzodeg">رایزودگ (Ryzodeg)</option><option value="human_mix">مخلوط انسانی ۷۰/۳۰ (Human Mix)</option></optgroup><optgroup label="انسولین‌های سریع‌الاثر (Bolus)"><option value="apidra_novorapid">آنالوگ سریع (NovoRapid / Apidra)</option><option value="regular">رگولار انسانی (Regular)</option></optgroup></select></div><div class="form-group" id="freqToBox" style="display:none"><label for="freqTo">⏱️ فرکانس تزریق انسولین مقصد:</label><select id="freqTo" onchange="updateRegimen()"><option value="1">۱ بار در روز (QD)</option><option value="2">۲ بار در روز (BID)</option><option value="3">۳ بار در روز (TID)</option></select></div><div class="form-group"><label for="currentDose">💊 دوز کل فعلی بیمار در ۲۴ ساعت (Total Daily Dose):</label><input type="number" id="currentDose" placeholder="مثلاً 30" min="1" max="120"></div><div class="form-group"><label for="guideline">📚 انتخاب گایدلاین مرجع:</label><select id="guideline" onchange="updateStrategies()"></select></div><div class="form-group" id="strategyBox"><label for="strategy">استراتژی بالینی کاهش دوز:</label><select id="strategy"><option value="0.8">کاهش ۲۰ درصدی دوز</option><option value="1.0">پایش مستقیم بالینی دوز معادل</option><option value="0.85">کاهش ۱۵ درصدی دوز</option></select></div><button onclick="convertInsulin()">محاسبه کلینیکال دوز</button><div class="result-box" id="resultBox"><div class="result-title">💡 دوز پیشنهادی جدید:</div><div id="resultText" style="font-size:20px;line-height:1.5"></div><div id="descText" style="margin-top:10px;font-size:14px;line-height:1.4"></div></div><div class="alert-text" id="alertBox"><strong>⚠️ هشدار بالینی مهم:</strong> محاسبات بر اساس فرمول‌های ریاضی گایدلاین منتخب استخراج شده است. پاسخ بیولوژیک بیمار و تیتراسیون بالینی همواره ارجحیت دارد.</div></div><script src="insulin-logic.js"></script><script src="pwa-handler.js"></script></body></html>
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0c766e" />
+    <meta name="description" content="پلتفرم دوزبانه پشتیبان تصمیم‌گیری بالینی دیابت" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" href="icon-192.png" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Diabeto | دستیار بالینی دیابت</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content" data-i18n="skip">پرش به محتوای اصلی</a>
+
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="ناوبری اصلی">
+        <a class="brand" href="#home" aria-label="Diabeto home">
+          <span class="brand-mark" aria-hidden="true">D</span>
+          <span><strong>Diabeto</strong><small data-i18n="clinicalPlatform">پلتفرم بالینی</small></span>
+        </a>
+
+        <nav class="main-nav">
+          <a class="nav-item active" href="#home" data-section="home"><span>⌂</span><span data-i18n="dashboard">داشبورد</span></a>
+          <a class="nav-item" href="#converter" data-section="converter"><span>⇄</span><span data-i18n="insulinConverter">تبدیل انسولین</span></a>
+          <a class="nav-item disabled" href="#" aria-disabled="true"><span>♙</span><span data-i18n="patients">بیماران</span><small data-i18n="soon">به‌زودی</small></a>
+          <a class="nav-item disabled" href="#" aria-disabled="true"><span>◇</span><span data-i18n="medications">داروها</span><small data-i18n="soon">به‌زودی</small></a>
+        </nav>
+
+        <div class="sidebar-note">
+          <span class="status-dot"></span>
+          <div><strong data-i18n="prototype">نسخه آزمایشی</strong><small data-i18n="notForPrescription">برای تجویز مستقل نیست</small></div>
+        </div>
+      </aside>
+
+      <div class="content-shell">
+        <header class="topbar">
+          <button class="mobile-menu" id="menuButton" aria-label="نمایش منو" aria-expanded="false">☰</button>
+          <div class="topbar-title">
+            <strong data-i18n="workspace">فضای کار بالینی</strong>
+            <span data-i18n="todayFocus">ابزارهای تصمیم‌یار برای ویزیت امروز</span>
+          </div>
+          <div class="topbar-actions">
+            <button class="language-toggle" id="languageToggle" type="button" aria-label="Change language">
+              <span class="language-current">فا</span><span class="toggle-divider"></span><span>EN</span>
+            </button>
+            <div class="avatar" aria-label="پزشک">د</div>
+          </div>
+        </header>
+
+        <main id="main-content">
+          <section class="view active" id="home" aria-labelledby="welcomeTitle">
+            <div class="hero">
+              <div>
+                <span class="eyebrow" data-i18n="clinicalWorkspace">Clinical workspace</span>
+                <h1 id="welcomeTitle" data-i18n="welcome">سلام دکتر، آماده‌اید؟</h1>
+                <p data-i18n="welcomeText">ابزارهای مورد نیاز برای تصمیم‌گیری سریع‌تر و مستندتر را از اینجا در دسترس دارید.</p>
+              </div>
+              <button class="primary-button" type="button" data-open-section="converter"><span>⇄</span><span data-i18n="startConversion">شروع تبدیل انسولین</span></button>
+            </div>
+
+            <div class="safety-banner" role="note">
+              <span class="safety-icon">i</span>
+              <div><strong data-i18n="safetyTitle">تصمیم نهایی با پزشک است</strong><p data-i18n="safetyText">خروجی‌های این نسخه، برآورد محاسباتی هستند و باید با وضعیت بیمار، قند خون و منابع تأییدشده تطبیق داده شوند.</p></div>
+            </div>
+
+            <div class="section-heading">
+              <div><h2 data-i18n="clinicalTools">ابزارهای بالینی</h2><p data-i18n="clinicalToolsText">ماژول‌های نسخه نخست پلتفرم</p></div>
+            </div>
+
+            <div class="tool-grid">
+              <article class="tool-card featured">
+                <div class="tool-icon teal">⇄</div>
+                <span class="card-status available" data-i18n="available">فعال</span>
+                <h3 data-i18n="insulinConverter">تبدیل انسولین</h3>
+                <p data-i18n="converterDescription">برآورد شفاف دوز هنگام تغییر بین انسولین‌های پایه، همراه با نمایش ضریب و هشدار ایمنی.</p>
+                <button class="text-button" type="button" data-open-section="converter"><span data-i18n="openTool">باز کردن ابزار</span><span>←</span></button>
+              </article>
+              <article class="tool-card muted-card">
+                <div class="tool-icon blue">G</div>
+                <span class="card-status" data-i18n="soon">به‌زودی</span>
+                <h3>GLP-1 / GIP</h3>
+                <p data-i18n="glpDescription">مقایسه داروها، دوزها و ملاحظات ایمنی در یک نمای واحد.</p>
+              </article>
+              <article class="tool-card muted-card">
+                <div class="tool-icon amber">⌁</div>
+                <span class="card-status" data-i18n="soon">به‌زودی</span>
+                <h3 data-i18n="treatmentPath">مسیر درمان</h3>
+                <p data-i18n="pathDescription">مسیر تصمیم‌گیری نسخه‌پذیر بر اساس بیماری‌های همراه و اهداف فردی.</p>
+              </article>
+            </div>
+
+            <div class="version-strip">
+              <div><span class="version-icon">✓</span><div><strong data-i18n="contentStatus">وضعیت محتوای بالینی</strong><p data-i18n="contentStatusText">قواعد نسخه آزمایشی؛ در انتظار بازبینی و تأیید کمیته علمی</p></div></div>
+              <span class="version-badge">Clinical content v0.1</span>
+            </div>
+          </section>
+
+          <section class="view" id="converter" aria-labelledby="converterTitle">
+            <button class="back-button" type="button" data-open-section="home">→ <span data-i18n="backDashboard">بازگشت به داشبورد</span></button>
+            <div class="page-heading">
+              <div><span class="eyebrow" data-i18n="calculator">Calculator</span><h1 id="converterTitle" data-i18n="insulinConverter">تبدیل انسولین</h1><p data-i18n="converterIntro">یک برآورد اولیه و قابل پیگیری برای تغییر انسولین پایه ایجاد کنید.</p></div>
+              <span class="version-badge">Engine v0.1</span>
+            </div>
+
+            <div class="calculator-layout">
+              <form class="calculator-card" id="conversionForm" novalidate>
+                <div class="form-section-title"><span>۱</span><div><strong data-i18n="currentRegimen">رژیم فعلی</strong><small data-i18n="requiredFields">تمام فیلدها الزامی هستند</small></div></div>
+                <div class="field-grid">
+                  <label class="field"><span data-i18n="currentInsulin">انسولین فعلی</span><select id="sourceInsulin" required></select></label>
+                  <label class="field"><span data-i18n="dailyDose">دوز کل روزانه</span><span class="input-with-unit"><input id="currentDose" type="number" min="1" max="300" inputmode="decimal" placeholder="24" required /><b data-i18n="units">واحد</b></span><small data-i18n="doseHelp">مجموع واحد تزریق‌شده طی ۲۴ ساعت</small></label>
+                </div>
+
+                <div class="form-divider"></div>
+                <div class="form-section-title"><span>۲</span><div><strong data-i18n="newRegimen">رژیم جایگزین</strong><small data-i18n="selectTarget">انسولین و رویکرد محاسبه را انتخاب کنید</small></div></div>
+                <div class="field-grid">
+                  <label class="field"><span data-i18n="targetInsulin">انسولین مقصد</span><select id="targetInsulin" required></select></label>
+                  <label class="field"><span data-i18n="safetyApproach">رویکرد محاسبه</span><select id="strategy"><option value="1" data-i18n="oneToOne">معادل ۱:۱</option><option value="0.8" data-i18n="reduceTwenty">کاهش احتیاطی ۲۰٪</option></select><small data-i18n="strategyHelp">انتخاب ضریب باید بر مبنای منبع معتبر و شرایط بیمار باشد.</small></label>
+                </div>
+
+                <div class="form-error" id="formError" role="alert"></div>
+                <button class="primary-button calculate-button" type="submit"><span data-i18n="calculate">محاسبه برآورد</span><span>←</span></button>
+              </form>
+
+              <aside class="result-panel" id="resultPanel" aria-live="polite">
+                <div class="empty-result" id="emptyResult"><div class="result-placeholder">⌁</div><h2 data-i18n="resultWaiting">نتیجه اینجا نمایش داده می‌شود</h2><p data-i18n="resultWaitingText">اطلاعات رژیم فعلی و مقصد را تکمیل کنید.</p></div>
+                <div class="result-content" id="resultContent" hidden>
+                  <span class="result-label" data-i18n="estimatedDose">برآورد دوز شروع</span>
+                  <div class="dose-result"><strong id="resultDose">—</strong><span data-i18n="unitsPerDay">واحد در روز</span></div>
+                  <div class="calculation-line"><span id="calculationText"></span></div>
+                  <dl class="result-details"><div><dt data-i18n="from">مبدأ</dt><dd id="resultSource"></dd></div><div><dt data-i18n="to">مقصد</dt><dd id="resultTarget"></dd></div><div><dt data-i18n="factor">ضریب</dt><dd id="resultFactor"></dd></div></dl>
+                  <div class="clinical-warning"><strong data-i18n="beforeUse">پیش از استفاده بالینی</strong><p data-i18n="beforeUseText">قند خون، سابقه هیپوگلیسمی، عملکرد کلیه و کبد، زمان‌بندی تزریق و اطلاعات رسمی فرآورده را بررسی کنید.</p></div>
+                  <button class="secondary-button" id="resetButton" type="button" data-i18n="newCalculation">محاسبه جدید</button>
+                </div>
+              </aside>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <script src="clinical-engine.js"></script>
+    <script src="app.js"></script>
+    <script src="pwa-handler.js"></script>
+  </body>
+</html>
