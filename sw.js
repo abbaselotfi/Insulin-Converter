@@ -1,4 +1,4 @@
-const cacheName = 'diabeto-v3';
+const cacheName = 'icon-v4';
 const assets = [
   './',
   './index.html',
