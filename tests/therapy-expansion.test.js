@@ -149,7 +149,7 @@ describe("expanded therapy conversion", () => {
     }
   });
 
-  test("refuses unsafe cross-category prandial paths and premix-to-Soliqua estimates", () => {
+  test("refuses unsafe cross-category prandial paths", () => {
     assert.throws(() => calculateConversion({
       sourceId: "glargine-u100",
       targetId: "aspart-u100",
@@ -167,11 +167,23 @@ describe("expanded therapy conversion", () => {
       dailyDose: 30,
       sourceFrequency: 3
     }), /INSUFFICIENT_REGIMEN/);
-    assert.throws(() => calculateConversion({
+  });
+
+  test("converts the basal component of premix to Soliqua with an explicit caution", () => {
+    const result = calculateConversion({
       sourceId: "aspart-mix-30",
       targetId: "soliqua",
-      dailyDose: 30,
+      dailyDose: 40,
       sourceFrequency: 2
-    }), /SOLIQUA_BASAL_ONLY/);
+    });
+
+    assert.equal(result.factor, 1);
+    assert.equal(result.adjustedBasalDose, 28);
+    assert.equal(result.estimatedDose, 20);
+    assert.equal(result.soliqua.pen, "100/50");
+    assert.equal(result.sourceComposition.basalDose, 28);
+    assert.match(result.formula, /70% basal/);
+    assert.match(result.note, /سهم بیزال 70٪/);
+    assert.match(result.note, /بازبینی متخصص/);
   });
 });
