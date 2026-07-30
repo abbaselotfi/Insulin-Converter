@@ -1,4 +1,4 @@
-const cacheName = 'icon-v4';
+const cacheName = 'icon-v5';
 const assets = [
   './',
   './index.html',
