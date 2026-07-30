@@ -4,6 +4,11 @@ const { INSULINS, GLP1, calculateConversion, selectSoliquaPen } = require("../cl
 describe("clinical conversion engine", () => {
   test("exposes basal, premix, prandial and FRC insulin categories", () => {
     assert.deepEqual(new Set(INSULINS.map((item) => item.category)), new Set(["basal", "premix", "prandial", "frc"]));
+    assert.equal(
+      INSULINS.filter((item) => item.category === "basal").length,
+      5,
+      "initial basal insulin catalog should remain available"
+    );
     assert.equal(GLP1.length, 4);
   });
 
