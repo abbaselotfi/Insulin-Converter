@@ -1,4 +1,4 @@
-# Clinical conversion rules (v0.2)
+# Clinical conversion rules (v0.3)
 
 This file records the rule provenance used by `clinical-engine.js`. The calculator is
 clinical decision support, not an autonomous prescription generator.
@@ -34,11 +34,25 @@ The engine stores the actual basal/prandial fraction of each product:
 | Human 70/30 | 70% | 30% |
 | Ryzodeg 70/30 | 70% | 30% |
 
-When converting a premix to basal or prandial insulin, only the matching component of the
-source total daily dose is used as the calculation basis. For a premix destination, the result
-shows its basal/prandial composition and an equal arithmetic split across the selected number
-of injections. The split is explicitly labeled as an initial display that must be individualized
-to meals and SMBG/CGM; it is not a universal meal-allocation protocol.
+When converting a premix to basal insulin, only the basal component of the source total daily
+dose is used as the calculation basis. For a premix destination, the result shows its
+basal/prandial composition and an equal arithmetic split across the selected number of
+injections. The split is explicitly labeled as an initial display that must be individualized to
+meals and SMBG/CGM; it is not a universal meal-allocation protocol.
+
+## Prandial insulin
+
+Prandial insulin is only offered when both source and destination are prandial products. The
+UI does not offer basal or premix targets for a prandial source, or prandial targets for a basal
+or premix source.
+
+- Rapid-acting analog to rapid-acting analog: start unit-for-unit.
+- Rapid-acting analog to Regular, or Regular to a rapid-acting analog: use 80% of the previous
+  total daily prandial dose as a conservative therapeutic-interchange starting dose.
+- Regular is generally administered about 30 minutes before a meal; rapid-acting analogs are
+  administered close to the start of the meal.
+
+Final meal doses still require individualization to carbohydrate intake and premeal glucose.
 
 ## FRC Soliqua / Suliqua
 
@@ -55,25 +69,8 @@ by 20% before the table is applied. The 100/50 pen is never started above 20 dos
 100/33 pen is never started above 30 dose steps. These caps limit the initial lixisenatide dose
 to 10 micrograms or less.
 
-Patients switching from a GLP-1 receptor agonist start at 10 dose steps using the 100/50 pen,
-after discontinuing the previous GLP-1 therapy. Automatic premix-to-Soliqua conversion is not
-offered because it is not specified in the product initiation table.
-
-## GLP-1–based therapy
-
-ADA 2026 does not provide a dose-equivalence table for switching between GLP-1 products.
-The calculator therefore displays timing guidance and the labeled starting dose of the
-destination rather than inventing an equivalent dose.
-
-For a weekly-to-weekly switch, the new drug starts at the next weekly dose. Daily-to-weekly
-starts the day after the last daily dose; weekly-to-daily starts when the next weekly dose would
-have been due. If switching because of gastrointestinal intolerance, symptoms should resolve
-and the destination should be restarted at its lowest labeled dose.
-
-For GLP-1 to basal insulin, there is no unit-for-unit conversion. The calculator shows the
-ADA 2026 basal initiation options of 10 units/day or 0.1–0.2 units/kg/day. It also notes that,
-without severe hyperglycemia, ADA 2026 prefers GLP-1–based therapy to insulin and generally
-considers combining GLP-1 therapy with insulin rather than automatically stopping it.
+Automatic premix-to-Soliqua conversion is not offered because it is not specified in the
+product initiation table.
 
 ## Primary references
 
@@ -81,4 +78,4 @@ considers combining GLP-1 therapy with insulin rather than automatically stoppin
 - [Suliqua EU Product Information](https://www.ema.europa.eu/en/documents/product-information/suliqua-epar-product-information_en.pdf)
 - [Lantus Prescribing Information](https://www.accessdata.fda.gov/drugsatfda_docs/label/2022/021081s076lbl.pdf)
 - [Toujeo Prescribing Information](https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/206538Orig1s017Lbl.pdf)
-- [Switching Between GLP-1 Receptor Agonists: Rationale and Practical Guidance](https://pmc.ncbi.nlm.nih.gov/articles/PMC7566932/)
+- [2025 Guide to Therapeutic Interchange of Insulin Products](https://www.cardi-oh.org/files/resources/cardi-oh-guide-to-therapeutic-interchange-of-insulin-products-for-safe-and-effective-transitions-in-diabetes-management.pdf)

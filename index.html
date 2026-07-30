@@ -9,23 +9,21 @@
     <link rel="icon" href="icon-192.png" />
     <link rel="apple-touch-icon" href="icon-192.png" />
     <link rel="stylesheet" href="styles.css" />
-    <title>Diabeto | دستیار بالینی دیابت</title>
+    <title>ICon | تبدیل بالینی انسولین</title>
   </head>
   <body>
     <a class="skip-link" href="#main-content" data-i18n="skip">پرش به محتوای اصلی</a>
 
     <div class="app-shell">
       <aside class="sidebar" aria-label="ناوبری اصلی">
-        <a class="brand" href="#home" aria-label="Diabeto home">
-          <span class="brand-mark" aria-hidden="true">D</span>
-          <span><strong>Diabeto</strong><small data-i18n="clinicalPlatform">پلتفرم بالینی</small></span>
+        <a class="brand" href="#home" aria-label="ICon home">
+          <span class="brand-mark" aria-hidden="true">I</span>
+          <span><strong>ICon</strong><small data-i18n="clinicalPlatform">تبدیل بالینی انسولین</small></span>
         </a>
 
         <nav class="main-nav">
           <a class="nav-item active" href="#home" data-section="home"><span>⌂</span><span data-i18n="dashboard">داشبورد</span></a>
           <a class="nav-item" href="#converter" data-section="converter"><span>⇄</span><span data-i18n="insulinConverter">تبدیل انسولین</span></a>
-          <a class="nav-item disabled" href="#" aria-disabled="true"><span>♙</span><span data-i18n="patients">بیماران</span><small data-i18n="soon">به‌زودی</small></a>
-          <a class="nav-item disabled" href="#" aria-disabled="true"><span>◇</span><span data-i18n="medications">داروها</span><small data-i18n="soon">به‌زودی</small></a>
         </nav>
 
         <div class="sidebar-note">
@@ -77,18 +75,6 @@
                 <p data-i18n="converterDescription">برآورد شفاف دوز هنگام تغییر بین انسولین‌های پایه، همراه با نمایش ضریب و هشدار ایمنی.</p>
                 <button class="text-button" type="button" data-open-section="converter"><span data-i18n="openTool">باز کردن ابزار</span><span>←</span></button>
               </article>
-              <article class="tool-card muted-card">
-                <div class="tool-icon blue">G</div>
-                <span class="card-status" data-i18n="soon">به‌زودی</span>
-                <h3>GLP-1 / GIP</h3>
-                <p data-i18n="glpDescription">مقایسه داروها، دوزها و ملاحظات ایمنی در یک نمای واحد.</p>
-              </article>
-              <article class="tool-card muted-card">
-                <div class="tool-icon amber">⌁</div>
-                <span class="card-status" data-i18n="soon">به‌زودی</span>
-                <h3 data-i18n="treatmentPath">مسیر درمان</h3>
-                <p data-i18n="pathDescription">مسیر تصمیم‌گیری نسخه‌پذیر بر اساس بیماری‌های همراه و اهداف فردی.</p>
-              </article>
             </div>
 
             <div class="version-strip">
@@ -100,8 +86,8 @@
           <section class="view" id="converter" aria-labelledby="converterTitle">
             <button class="back-button" type="button" data-open-section="home">→ <span data-i18n="backDashboard">بازگشت به داشبورد</span></button>
             <div class="page-heading">
-              <div><span class="eyebrow" data-i18n="calculator">Calculator</span><h1 id="converterTitle" data-i18n="insulinConverter">تبدیل انسولین</h1><p data-i18n="converterIntro">تبدیل بیزال، میکس، پرندیال، FRC و راهنمای سوییچ GLP-1 را بر اساس مسیر درمان بررسی کنید.</p></div>
-              <span class="version-badge">Engine v0.2</span>
+              <div><span class="eyebrow" data-i18n="calculator">Calculator</span><h1 id="converterTitle" data-i18n="insulinConverter">تبدیل انسولین</h1><p data-i18n="converterIntro">تبدیل انسولین‌های بیزال، میکس، پرندیال و FRC را بر اساس مسیر معتبر بررسی کنید.</p></div>
+              <span class="version-badge">Engine v0.3</span>
             </div>
 
             <div class="calculator-layout">
@@ -111,7 +97,6 @@
                   <label class="field"><span data-i18n="currentInsulin">درمان فعلی</span><select id="sourceInsulin" required></select></label>
                   <label class="field" id="doseField"><span data-i18n="dailyDose">دوز کل روزانه</span><span class="input-with-unit"><input id="currentDose" type="number" min="1" max="300" inputmode="decimal" placeholder="24" required /><b data-i18n="units">واحد</b></span><small data-i18n="doseHelp">مجموع واحد تزریق‌شده طی ۲۴ ساعت</small></label>
                   <label class="field" id="frequencyField" hidden><span data-i18n="injectionsPerDay">تعداد تزریق در روز</span><select id="sourceFrequency"></select><small data-i18n="frequencyHelp">دوز ورودی باید مجموع تمام تزریق‌های ۲۴ ساعت باشد.</small></label>
-                  <label class="field" id="weightField" hidden><span data-i18n="weight">وزن بیمار</span><span class="input-with-unit"><input id="weightKg" type="number" min="30" max="300" inputmode="decimal" placeholder="80" /><b>kg</b></span><small data-i18n="weightHelp">برای محاسبه بازه شروع بازال از GLP-1 لازم است.</small></label>
                 </div>
 
                 <div class="form-divider"></div>
@@ -138,7 +123,7 @@
                   <p id="resultNote" class="result-note"></p>
                   <dl class="result-details"><div><dt data-i18n="from">مبدأ</dt><dd id="resultSource"></dd></div><div><dt data-i18n="to">مقصد</dt><dd id="resultTarget"></dd></div><div><dt data-i18n="factor">ضریب</dt><dd id="resultFactor"></dd></div></dl>
                   <div class="clinical-warning"><strong data-i18n="beforeUse">پیش از استفاده بالینی</strong><p data-i18n="beforeUseText">قند خون، سابقه هیپوگلیسمی، عملکرد کلیه و کبد، زمان‌بندی تزریق و اطلاعات رسمی فرآورده را بررسی کنید.</p></div>
-                  <div class="clinical-sources"><strong>منابع قواعد</strong><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12690185/" target="_blank" rel="noopener">ADA Standards of Care 2026، بخش ۹</a><a href="https://www.ema.europa.eu/en/documents/product-information/suliqua-epar-product-information_en.pdf" target="_blank" rel="noopener">Suliqua EU Product Information</a><a href="https://www.accessdata.fda.gov/drugsatfda_docs/label/2022/021081s076lbl.pdf" target="_blank" rel="noopener">Lantus Prescribing Information</a><a href="https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/206538Orig1s017Lbl.pdf" target="_blank" rel="noopener">Toujeo Prescribing Information</a><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7566932/" target="_blank" rel="noopener">Peer-reviewed GLP-1 switching guidance</a><small>ADA 2026 دوز معادل برای سوییچ GLP-1ها یا قاعده عمومی ۲۰٪ برای همه تبدیل‌های انسولین ارائه نمی‌کند. قواعد اختصاصی برچسب دارو جداگانه اعمال شده‌اند.</small></div>
+                  <div class="clinical-sources"><strong>منابع قواعد</strong><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12690185/" target="_blank" rel="noopener">ADA Standards of Care 2026، بخش ۹</a><a href="https://www.ema.europa.eu/en/documents/product-information/suliqua-epar-product-information_en.pdf" target="_blank" rel="noopener">Suliqua EU Product Information</a><a href="https://www.accessdata.fda.gov/drugsatfda_docs/label/2022/021081s076lbl.pdf" target="_blank" rel="noopener">Lantus Prescribing Information</a><a href="https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/206538Orig1s017Lbl.pdf" target="_blank" rel="noopener">Toujeo Prescribing Information</a><a href="https://www.cardi-oh.org/files/resources/cardi-oh-guide-to-therapeutic-interchange-of-insulin-products-for-safe-and-effective-transitions-in-diabetes-management.pdf" target="_blank" rel="noopener">2025 Insulin Therapeutic Interchange Guide</a><small>قواعد اختصاصی برچسب دارو بر ضریب انتخابی اولویت دارند. تبدیل rapid-acting با Regular با کاهش احتیاطی ۲۰٪ نمایش داده می‌شود.</small></div>
                   <button class="secondary-button" id="resetButton" type="button" data-i18n="newCalculation">محاسبه جدید</button>
                 </div>
               </aside>

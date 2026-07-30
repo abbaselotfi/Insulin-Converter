@@ -49,7 +49,7 @@ Key long-term modules:
 - [`docs/GUIDELINE_UPDATE_STRATEGY.md`](docs/GUIDELINE_UPDATE_STRATEGY.md): yearly guideline and medication update workflow.
 - [`docs/ADMIN_PANEL.md`](docs/ADMIN_PANEL.md): non-developer admin panel requirements for display priorities.
 - [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md): initial data model for guidelines, medications, brands, and display settings.
-- [`docs/CLINICAL_RULES.md`](docs/CLINICAL_RULES.md): implemented insulin, FRC, and GLP-1 switching rules with source provenance.
+- [`docs/CLINICAL_RULES.md`](docs/CLINICAL_RULES.md): implemented basal, premix, prandial, and FRC switching rules with source provenance.
 
 ## Clinical safety principle
 

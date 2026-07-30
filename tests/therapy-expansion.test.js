@@ -1,7 +1,6 @@
 const assert = require("node:assert/strict");
 const {
   ALL_INSULINS,
-  GLP1,
   calculateConversion,
   compositionFor,
   getInsulin,
@@ -12,7 +11,6 @@ const {
 describe("expanded therapy conversion", () => {
   test("exposes basal, premix, prandial and FRC insulin categories", () => {
     assert.deepEqual(new Set(ALL_INSULINS.map((item) => item.category)), new Set(["basal", "premix", "prandial", "frc"]));
-    assert.equal(GLP1.length, 5);
   });
 
   test("reduces the total daily dose for a multiple-injection basal regimen", () => {
@@ -90,17 +88,6 @@ describe("expanded therapy conversion", () => {
     assert.equal(fromToujeo.soliqua.pen, "100/50");
   });
 
-  test("starts Soliqua after GLP-1 with the peach 100/50 pen at 10 dose steps", () => {
-    const result = calculateConversion({
-      sourceId: "semaglutide-weekly",
-      targetId: "soliqua"
-    });
-    assert.equal(result.estimatedDose, 10);
-    assert.equal(result.soliqua.pen, "100/50");
-    assert.equal(result.soliqua.colorClass, "pen-peach");
-    assert.match(result.note, /قطع شود/);
-  });
-
   test("uses the actual basal and prandial fractions of premixed insulin", () => {
     assert.deepEqual(compositionFor(getInsulin("lispro-mix-25"), 40), {
       basalPercent: 75,
@@ -135,42 +122,50 @@ describe("expanded therapy conversion", () => {
     assert.equal(splitDailyDose(41, 3).reduce((sum, item) => sum + item.dose, 0), 41);
   });
 
-  test("returns timing guidance instead of inventing an equivalent GLP-1 dose", () => {
-    const weekly = calculateConversion({
-      sourceId: "semaglutide-weekly",
-      targetId: "dulaglutide-weekly"
+  test("keeps rapid analog switches 1:1 but reduces rapid/Regular interchanges by 20%", () => {
+    const rapidToRapid = calculateConversion({
+      sourceId: "aspart-u100",
+      targetId: "lispro-u100",
+      dailyDose: 30,
+      factor: 0.8,
+      sourceFrequency: 3
     });
-    assert.equal(weekly.guidanceOnly, true);
-    assert.match(weekly.guidance, /۷ روز پس از آخرین دوز/);
-    assert.match(weekly.guidance, /دوز معادل مستقیم/);
+    assert.equal(rapidToRapid.factor, 1);
+    assert.equal(rapidToRapid.estimatedDose, 30);
 
-    const dailyToWeekly = calculateConversion({
-      sourceId: "liraglutide-daily",
-      targetId: "semaglutide-weekly"
-    });
-    assert.match(dailyToWeekly.guidance, /روز بعد/);
+    for (const [sourceId, targetId] of [
+      ["aspart-u100", "regular-u100"],
+      ["regular-u100", "glulisine-u100"]
+    ]) {
+      const result = calculateConversion({
+        sourceId,
+        targetId,
+        dailyDose: 30,
+        sourceFrequency: 3
+      });
+      assert.equal(result.factor, 0.8);
+      assert.equal(result.estimatedDose, 24);
+      assert.match(result.note, /۲۰٪/);
+    }
   });
 
-  test("shows ADA basal initiation options after GLP-1 without claiming equivalence", () => {
-    const result = calculateConversion({
-      sourceId: "semaglutide-weekly",
-      targetId: "glargine-u100",
-      weightKg: 80
-    });
-    assert.equal(result.guidanceOnly, true);
-    assert.equal(result.resultLabel, "۱۰ واحد یا 8–16 واحد/روز");
-    assert.match(result.formula, /0.1–0.2/);
-    assert.throws(() => calculateConversion({
-      sourceId: "semaglutide-weekly",
-      targetId: "glargine-u100"
-    }), /WEIGHT_REQUIRED/);
-  });
-
-  test("refuses unsafe direct basal-to-prandial and premix-to-Soliqua estimates", () => {
+  test("refuses unsafe cross-category prandial paths and premix-to-Soliqua estimates", () => {
     assert.throws(() => calculateConversion({
       sourceId: "glargine-u100",
       targetId: "aspart-u100",
       dailyDose: 30
+    }), /INSUFFICIENT_REGIMEN/);
+    assert.throws(() => calculateConversion({
+      sourceId: "aspart-mix-30",
+      targetId: "aspart-u100",
+      dailyDose: 30,
+      sourceFrequency: 2
+    }), /INSUFFICIENT_REGIMEN/);
+    assert.throws(() => calculateConversion({
+      sourceId: "aspart-u100",
+      targetId: "glargine-u100",
+      dailyDose: 30,
+      sourceFrequency: 3
     }), /INSUFFICIENT_REGIMEN/);
     assert.throws(() => calculateConversion({
       sourceId: "aspart-mix-30",
