@@ -12,13 +12,14 @@
 const path = require("path");
 
 const SW = path.join(__dirname, "..", "sw.js");
-const CACHE_NAME = "diabeto-v2";
+const CACHE_NAME = "diabeto-v3";
 const CORE_ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
   "./clinical-engine.js",
+  "./soliqua.html",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
