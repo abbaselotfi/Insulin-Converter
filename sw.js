@@ -1,10 +1,11 @@
-const cacheName = 'diabeto-v2';
+const cacheName = 'diabeto-v3';
 const assets = [
   './',
   './index.html',
   './styles.css',
   './app.js',
   './clinical-engine.js',
+  './soliqua.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'
